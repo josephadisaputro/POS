@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://code.jquery.com/jquery-3.6.1.js" integrity="sha256-3zlB5s2uwoUzrXK3BT7AX3FyvojsraNFxCc2vC/7pNI=" crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300&family=Dosis:wght@200&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <title>POS</title>
+    <style>
+        body{
+            font-family: 'Comfortaa', cursive;
+        }
+
+        /* width */
+        ::-webkit-scrollbar {
+            width: 0%;
+        }
+
+        /* Track */
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        
+        /* Handle */
+        ::-webkit-scrollbar-thumb {
+            background: #888; 
+        }
+
+        /* Handle on hover */
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555; 
+        }
+
+        :root {
+            --borderRadius: 10px;
+            --commonMargin: 1%;
+            --commonTransition: 1s;
+        }
+
+        .main-container{
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            width: 100%;
+            transition: var(--commonTransition);
+        }
+
+        .main-container .panel-container{
+            width: 100%;
+            margin: 0.25%;
+            height: 95.8vh;
+            background-color: lightgrey;
+            border-radius: var(--borderRadius);
+            text-align: right;
+            transition: var(--commonTransition);
+            padding: 0.25%;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            overflow-y: scroll;
+            flex-grow: 1;
+            justify-content: flex-start;
+            align-content: flex-start; /* NEW */
+        }
+
+        .main-container .checkout-container{
+            width: 46%;
+            margin: 0.25%;
+            height: 96.5vh;
+            background-color: whitesmoke;
+            border-radius: var(--borderRadius);
+            text-align: left;
+            transition: var(--commonTransition);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .checkout-table{
+            background-color: white;
+            margin: var(--commonMargin);
+            width: 98%;
+            height: 70vh;
+            border-radius: var(--borderRadius);
+            overflow-y: scroll;
+        }
+
+        .checkout-table .checkout-table-header{
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            background-color: grey;
+            border-radius: var(--borderRadius) var(--borderRadius) 0 0 ;
+        }
+
+        .checkout-table-header div{
+            color: white;
+            text-align: center;
+            width: 100%;
+            margin: var(--commonMargin);
+        }
+
+        .checkout-table .checkout-table-content{
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+        }
+
+        .checkout-table-content div{
+            color: black;
+            text-align: center;
+            width: 100%;
+            margin: var(--commonMargin);
+        }
+
+        .checkout-table-content .item-quantity{
+            border: none;
+            border-radius: var(--borderRadius);
+            background-color: #888;
+            color: white;
+            text-align: center;
+        }
+
+        .checkout-final{
+            background-color: white;
+            margin: var(--commonMargin);
+            width: 98%;
+            height: 30vh;
+            border-radius: var(--borderRadius);
+        }
+
+        .checkout-final .checkout-table-content{
+            font-size: 3.5vh;
+            height: 6vh;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+        }
+
+        .panel-container-content{
+            width: 100%;
+            margin: 0.25%;
+            height: 93.5%;
+            background-color: whitesmoke;
+            border-radius: var(--borderRadius);
+            text-align: right;
+            transition: var(--commonTransition);
+            padding: 0.25%;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            overflow-y: scroll;
+            flex-grow: 1;
+            justify-content: flex-start;
+            align-content: flex-start; /* NEW */
+        }
+
+        .panel-container-content-items{
+            width: 20%;
+            background-color: green;
+            border-radius: var(--borderRadius);
+            margin: 0.25%;
+            text-align: center;
+            font-size: 140%;
+            color: white;
+        }
+
+        .panel-container-content-items p{
+            white-space: nowrap; 
+            overflow: hidden;
+            text-overflow: ellipsis; 
+        }
+
+        .panel-container-content-items .initial{
+            font-size: 340%;
+            margin: 0;
+            color: white;
+        }
+
+        .panel-container-header{
+            width: 100%;
+            height: 5%;
+            font-size: 140%;
+            margin-bottom: 0.25%;
+            background-color: whitesmoke;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            border-radius: var(--borderRadius) var(--borderRadius) 0 0;
+        }
+
+        .panel-container-header-category-title{
+            width: 100%;
+            text-align: center;
+            border-right: 1px solid rgba(0, 0, 0, 0.19);
+            border-left: 1px solid rgba(0, 0, 0, 0.19);
+            border-radius: var(--borderRadius);
+            margin: 0.1%;
+            white-space: nowrap; 
+            overflow: hidden;
+            text-overflow: ellipsis; 
+        }
+
+        .setting-toolbar{
+            position: fixed;
+            bottom: 1.5%;
+            left: 0.5%;
+            width:5vh;
+            padding: 0;
+            margin: 0;
+            font-size: 5vh;
+            border-radius: var(--borderRadius);
+            display: flex;
+            flex-direction: row;
+
+        }
+        .setting-toolbar-box-background{
+            position: fixed;
+            background-color: rgba(0, 0, 0, 0.2);
+            width: 100%;
+            height: 100vh;
+            top: 0;
+            left: 0;
+            z-index: 2;
+            display: none;
+        }
+        .setting-toolbar-box{
+            position: fixed;
+            top: 10%;
+            left: 50%;
+            margin-left: -40%;
+            width: 80%;
+            height: 80vh;
+            background-color: whitesmoke;
+            border-radius: var(--borderRadius);
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            overflow-y: scroll;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            z-index: 3;
+            display: none;
+            flex-direction: row;
+            flex-wrap: wrap;
+            flex-grow: 1;
+            justify-content: flex-start;
+            align-content: flex-start; /* NEW */
+        }
+
+        .menu{
+            width: 100%;
+            padding: 1%;
+            background-color: white;
+            color: black;
+            margin: var(--commonMargin);
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            border-radius: var(--borderRadius);
+            border: none;
+            font-size: x-large;
+            transition: 1s;
+        }
+
+        .menu:hover{
+            background-color: darkgrey;
+            color: whitesmoke;
+            transition: 1s;
+        }
+
+        .admin-category-list{
+            width: 20%;
+            padding: 1%;
+            background-color: white;
+            color: black;
+            margin: var(--commonMargin);
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            border-radius: var(--borderRadius);
+            border: none;
+            font-size: x-large;
+            transition: 1s;
+            white-space: nowrap; 
+            overflow: hidden;
+            text-overflow: ellipsis; 
+            text-align: center;
+        }
+
+        .admin-category-add{
+            width: 20%;
+            padding: 1%;
+            background-color: green;
+            color: black;
+            margin: var(--commonMargin);
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            border-radius: var(--borderRadius);
+            border: none;
+            font-size: x-large;
+            transition: 1s;
+            text-align: center;
+        }
+
+        .add-cross-button-icon{
+            color: white;
+            position: relative;
+            top: 50%;
+            border: none;
+            width: 100%;
+            font-size: x-large;
+        }
+        
+        .checkout{
+            background-color: green;
+            color: whitesmoke !important;
+            border-radius: var(--borderRadius);
+        }
+
+        .cancel{
+            background-color: darkred;
+            color: whitesmoke !important;
+            border-radius: var(--borderRadius);
+        }
+
+        .general-modal{
+            position: fixed;
+            top: 10%;
+            left: 50%;
+            margin-left: -40%;
+            width: 78%;
+            height: 80vh;
+            background-color: whitesmoke;
+            border-radius: var(--borderRadius);
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            display: none;
+            z-index: 3;
+            padding: 1%;
+        }
+
+        .input-general-pop-up-setting{
+            width: 100%;
+            background-color: whitesmoke;
+            border-radius: var(--borderRadius);
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            padding: 1%;
+            margin: var(--commonMargin);
+            height: auto;
+            font-size: x-large;
+            border: none;
+        }
+
+        .categoryDDLGENERIC{
+            width: 100%;
+            background-color: transparent;
+            border-radius: var(--borderRadius);
+            border: none;
+            padding: 1%;
+            height: auto;
+            font-size: x-large;
+        }
+
+        .categoryDDLGENERIC option{
+            width: 100%;
+            background-color: transparent;
+            border-radius: var(--borderRadius);
+            border: none;
+            padding: 1%;
+            height: auto;
+            font-size: x-large;
+        }
+
+        .generalSubmitButtonForSettingMenu{
+            width: 100%;
+            background-color: green;
+            border-radius: var(--borderRadius);
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            padding: 1%;
+            margin: var(--commonMargin);
+            height: auto;
+            font-size: x-large;
+            text-align: center;
+            color: whitesmoke;
+        }
+
+        .generalDeleteButtonForSettingMenu{
+            width: 100%;
+            background-color: darkred;
+            border-radius: var(--borderRadius);
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            padding: 1%;
+            margin: var(--commonMargin);
+            height: auto;
+            font-size: x-large;
+            text-align: center;
+            color: whitesmoke;
+        }
+
+        .detailedItem{
+            background-color: darkslategray;
+            color: white;
+            border: none;
+            border-radius: var(--borderRadius);
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            padding: 1%;
+            font-size: x-large;
+            width: 98%;
+            height: 97%;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            overflow-y: scroll;
+            flex-grow: 1;
+            justify-content: flex-start;
+            align-content: flex-start; /* NEW */
+        }
+        .detailedItem .itemIcon{
+            text-align: center;
+            width: 30%;
+            background-color: whitesmoke;
+            color: black;
+            border: none;
+            border-radius: var(--borderRadius);
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            font-size: 540%;
+            margin: var(--commonMargin);
+        }
+
+        .detailedItem .itemDetails{
+            text-align: left;
+            padding: 1%;
+            width: 100%;
+            color: white;
+            background-color: darkgreen;
+            border: none;
+            border-radius: var(--borderRadius);
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            font-size: 140%;
+            margin: var(--commonMargin);
+        }
+
+        .detailedItem .itemActions{
+            width: 64%;
+            height: 30%;
+            background-color: lightgray;
+            color: black;
+            border: none;
+            border-radius: var(--borderRadius);
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            font-size: 540%;
+            margin: var(--commonMargin);
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            padding: 1%;
+        }
+
+        .itemActions div{
+            width: 100%;
+            text-align: center;
+            font-size: x-large;
+            color: white;
+            border: none;
+            margin: var(--commonMargin);
+            background-color: darkslategray;
+            border-radius: var(--borderRadius);
+            padding: 1%;
+        }
+
+        .customInputsForAddToCart input{
+            font-size: xx-large;
+            border: none;
+            border-radius: var(--borderRadius);
+            margin-top: 1%;
+            width: 100%;
+        }
+
+        .itemActions .add-to-cart{
+            background-color: green;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <div class="panel-container">
+            <div class="panel-container-header">
+            </div>
+            <div class="panel-container-content">
+                <div class="panel-container-content-items">
+
+                </div>
+                <div class="panel-container-content-items">
+
+                </div>
+                <div class="panel-container-content-items">
+
+                </div>
+                <div class="panel-container-content-items">
+
+                </div>
+            </div>
+        </div>
+        <div class="checkout-container">
+            <div class="checkout-table">
+                <div class="checkout-table-header">
+                    <div>
+                        Quantity
+                    </div>
+                    <div>
+                        Product Name
+                    </div>
+                    <div>
+                        Price
+                    </div>
+                </div>
+                <!--  -->
+                <div class="checkout-table-content">
+                    <div>
+                        <input class="item-quantity" type="number" min="0" max="100"></input>
+                    </div>
+                    <div>
+                        Product Name
+                    </div>
+                    <div>
+                        Price
+                    </div>
+                </div>
+            </div>
+
+            <div class="checkout-final">
+                <div class="checkout-table-content">
+                    <div>
+                        Sub-total
+                    </div>
+                    <div class="subTotal">
+                        0
+                    </div>
+                </div>
+                <div class="checkout-table-content">
+                    <div>
+                        Tax
+                    </div>
+                    <div class="tax">
+                        0
+                    </div>
+                </div>
+                <div class="checkout-table-content">
+                    <div>
+                        Tip
+                    </div>
+                    <div class="tip">
+                        0
+                    </div>
+                </div>
+                <div class="checkout-table-content">
+                    <div>
+                        Total
+                    </div>
+                    <div class="total">
+                        0
+                    </div>
+                </div>
+                <div class="checkout-table-content">
+                    <div class="checkout">
+                        Checkout
+                    </div>
+                    <div class="cancel">
+                        Cancel
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="setting-toolbar">
+            <i class="setting-toolbar-selection fa fa-gear"></i>
+            <i class="setting-toolbar-selection fa account">&#xf007;</i>
+        </div>
+        <div class="setting-toolbar-box-background">
+        </div>
+        <div class="setting-toolbar-box">
+        </div>
+
+        <div class="general-modal">
+
+        </div>
+    </div>
+
+    <script>
+        $( document ).ready(async function() {
+            // $(".panel-container-content").css("height", $(".panel-container-content").width());
+            $(".setting-toolbar").css("height", $(".setting-toolbar").width());
+            let data = {
+                "userEmail": localStorage.getItem('email'),
+                "uuid": localStorage.getItem('uuid'),
+                "page": 0,
+                "limit": 10
+            }
+            let response = await ajaxCall(await ajaxSettings(`admin/category/get`, 'POST', data))
+            if(response.status){
+                $(".panel-container-header").empty()
+                for(const eachCategory of response.categories){
+                    $(".panel-container-header").append(`
+                        <div class="panel-container-header-category-title" onclick="showItemsInCategory(this, \'${eachCategory.categoryName}\')">
+                            ${eachCategory.categoryName}
+                        </div>
+                    `)
+                }
+            }
+        });
+
+        async function viewEdit(selected) {
+            if(selected.includes('categories')){
+                let data = {
+                    "userEmail": localStorage.getItem('email'),
+                    "uuid": localStorage.getItem('uuid'),
+                    "page": 0,
+                    "limit": 10
+                }
+                let response = await ajaxCall(await ajaxSettings(`admin/category/get`, 'POST', data))
+                if(response.status){
+                    $(".setting-toolbar-box").empty()
+                    for(const eachCategory of response.categories){
+                        $(".setting-toolbar-box").append(`
+                            <div 
+                                class="admin-category-list ${eachCategory.categoryName}" onclick="viewDetails(\'category\',\'${eachCategory.categoryName}\')">
+                                ${eachCategory.categoryName}
+                            </div>
+                        `)
+                        $(".admin-category-list").css('height', `${$(".admin-category-list").width()}`)
+                    }
+                    $(".setting-toolbar-box").append(`
+                        <div class="admin-category-add" onclick="addNewCategory()">
+                            <i class="add-cross-button-icon fa fa-plus"></i>
+                            <p class="add-cross-button-icon">Add</p>
+                        </div>`)
+                    $(".admin-category-add").css('height', `${$(".admin-category-add").width()}`)
+                } 
+            }else if(selected.includes('items')){
+                let data = {
+                    "userEmail": localStorage.getItem('email'),
+                    "uuid": localStorage.getItem('uuid'),
+                    "page": 0,
+                    "limit": 10
+                }
+                let response = await ajaxCall(await ajaxSettings(`admin/item/get`, 'POST', data))
+                if(response.status){
+                    $(".setting-toolbar-box").empty()
+                    for(const eachCategory of response.categories){
+                        $(".setting-toolbar-box").append(`
+                            <div 
+                                class="admin-category-list ${eachCategory.itemName}" onclick="viewDetails(\'item\',\'${eachCategory.itemSKU}\')">
+                                        <p>${eachCategory.itemName}</p>
+                                        <p>${eachCategory.categoryName}</p>
+                                        <p>${eachCategory.itemPrice}</p>
+                            </div>
+                        `)
+                        $(".admin-category-list").css('height', `${$(".admin-category-list").width()}`)
+                    }
+                    $(".setting-toolbar-box").append(`
+                        <div class="admin-category-add" onclick="addNewItem()">
+                            <i class="add-cross-button-icon fa fa-plus"></i>
+                            <p class="add-cross-button-icon">Add</p>
+                        </div>`)
+                    $(".admin-category-add").css('height', `${$(".admin-category-add").width()}`)
+                }    
+            } else if(selected.includes('logout')){
+                let data = {
+                    "userEmail": localStorage.getItem('email'),
+                    "uuid": localStorage.getItem('uuid'),
+                }
+                let response = await ajaxCall(await ajaxSettings(`logout`, 'POST', data))
+                if(response.status){
+                    window.location.href = "./";
+                }
+            }
+        }
+
+        async function viewDetails(type,selected){
+            $(".setting-toolbar-box").empty()
+            if(type == 'category'){
+                $(".setting-toolbar-box").append(`
+                    <input class="input-general-pop-up-setting" type="text" value="${selected}">
+                    </input>
+                    <div class="generalSubmitButtonForSettingMenu" onclick="submitNewlyEditedCategory(\'selected\')">
+                        edit
+                    </div>  
+                    <div class="generalDeleteButtonForSettingMenu" onclick="submitDeleteCategory(\'selected\')">
+                        delete
+                    </div> 
+                `)
+            }else if(type == 'item'){
+                let data = {
+                    "userEmail": localStorage.getItem('email'),
+                    "uuid": localStorage.getItem('uuid'),
+                    "page": 0,
+                    "limit": 10,
+                    "itemSKU": selected
+                }
+                let response = await ajaxCall(await ajaxSettings(`admin/item/get`, 'POST', data))
+                console.log(response)
+                if(response.status){
+                    $(".setting-toolbar-box").append(`
+                        <input class="input-general-pop-up-setting itemSKU" type="text" value="${response.categories.itemSKU}">
+                        </input>
+                        <input class="input-general-pop-up-setting itemName" type="text" value="${response.categories.itemName}">
+                        </input>
+                        <input class="input-general-pop-up-setting itemName" type="text" value="${response.categories.itemPrice}">
+                        </input>
+                        <input class="input-general-pop-up-setting itemName" type="text" value="${response.categories.itemStock}">
+                        </input>
+                        <input class="input-general-pop-up-setting itemName" type="text" value="${response.categories.itemDesc}">
+                        </input>
+                        <div class="input-general-pop-up-setting categoryDDL">
+                        </div>
+                        <div class="generalSubmitButtonForSettingMenu" onclick="submitNewlyEditedCategory(\'selected\')">
+                            edit
+                        </div>  
+                        <div class="generalDeleteButtonForSettingMenu" onclick="submitDeleteCategory(\'selected\')">
+                            delete
+                        </div> 
+                    `)
+                    data = {
+                        "userEmail": localStorage.getItem('email'),
+                        "uuid": localStorage.getItem('uuid'),
+                        "page": 0,
+                        "limit": 10
+                    }
+                    let categoryList = await ajaxCall(await ajaxSettings(`admin/category/get`, 'POST', data))
+                    if(categoryList.status){
+                        $(".categoryDDL").append(`
+                            <select class="categoryDDLGENERIC" name="categoryDDL" id="categoryDDL">
+                            </select>
+                        `)
+                        for(const eachCategory of categoryList.categories){
+                            $(".categoryDDLGENERIC").append(`
+                                <option value="${eachCategory.categoryName}">${eachCategory.categoryName}</option>
+                            `)
+                        }
+                    }
+                    // $(".categoryDDLGENERIC select").val(`${response.categories.categoryName}`).change();
+                    $(`.categoryDDLGENERIC option[value=${response.categories.categoryName}]`).attr('selected','selected');
+                }
+            }
+        }
+
+        async function submitDeleteCategory(oldCategoryName){
+            let data = {
+                "userEmail": localStorage.getItem('email'),
+                "uuid": localStorage.getItem('uuid'),
+                "categoryName": $(".input-general-pop-up-setting").val()
+            }
+            let response = await ajaxCall(await ajaxSettings(`admin/category`, 'DELETE', data))
+            if(response.status){
+
+            }else{
+                
+            }
+        }
+        
+        async function submitNewlyEditedCategory(oldCategoryName){
+            let data = {
+                "userEmail": localStorage.getItem('email'),
+                "uuid": localStorage.getItem('uuid'),
+                "categoryName": $(".input-general-pop-up-setting").val(),
+                "oldCategoryName": oldCategoryName
+            }
+            let response = await ajaxCall(await ajaxSettings(`admin/category`, 'PUT', data))
+            if(response.status){
+
+            }else{
+
+            }
+        }
+
+        async function addNewItem(){
+            $(".setting-toolbar-box").empty()
+            $(".setting-toolbar-box").append(`
+                <input class="input-general-pop-up-setting itemName" type="text" placeholder="New item name">
+                </input>
+                <input class="input-general-pop-up-setting itemSKU" type="text" placeholder="item SKU">
+                </input>
+                <input class="input-general-pop-up-setting itemPrice" type="text" placeholder="item price">
+                </input>
+                <input class="input-general-pop-up-setting stock" type="text" placeholder="stock">
+                </input>
+                <input class="input-general-pop-up-setting description" type="text" placeholder="description">
+                </input>
+                <div class="input-general-pop-up-setting categoryDDL">
+                </div>
+                <div class="generalSubmitButtonForSettingMenu" onclick="submitNewItem()">
+                    Submit
+                </div>  
+            `)
+            let data = {
+                "userEmail": localStorage.getItem('email'),
+                "uuid": localStorage.getItem('uuid'),
+                "page": 0,
+                "limit": 10
+            }
+            let response = await ajaxCall(await ajaxSettings(`admin/category/get`, 'POST', data))
+            if(response.status){
+                $(".categoryDDL").append(`
+                    <select class="categoryDDLGENERIC" name="categoryDDL" id="categoryDDL">
+                    </select>
+                `)
+                for(const eachCategory of response.categories){
+                    $(".categoryDDLGENERIC").append(`
+                        <option value="${eachCategory.categoryName}">${eachCategory.categoryName}</option>
+                    `)
+                }
+            }
+        }
+
+        async function submitNewItem(){
+            let data = {
+                "userEmail": localStorage.getItem('email'),
+                "uuid": localStorage.getItem('uuid'),
+                "itemName":  $(".itemName").val(),
+                "itemSKU":  $(".itemSKU").val(),
+                "itemPrice":  $(".itemPrice").val(),
+                "itemStock":  $(".stock").val(),
+                "itemDesc":  $(".description").val(),
+                "categoryName":  $('.categoryDDLGENERIC').find(":selected").val(),
+            }
+            let response = await ajaxCall(await ajaxSettings(`admin/item`, 'POST', data))
+            removeAllOpenSetting()
+        }
+
+        async function addNewCategory(){
+            $(".setting-toolbar-box").empty()
+            $(".setting-toolbar-box").append(`
+                <input class="input-general-pop-up-setting" type="text" placeholder="New category name">
+                </input>
+                <div class="generalSubmitButtonForSettingMenu" onclick="submitNewCategory()">
+                    Submit
+                </div>  
+            `)
+        }
+
+        async function submitNewCategory() {
+            let data = {
+                "userEmail": localStorage.getItem('email'),
+                "uuid": localStorage.getItem('uuid'),
+                "categoryName": $(".input-general-pop-up-setting").val()
+            }
+            let response = await ajaxCall(await ajaxSettings(`admin/category`, 'POST', data))
+            removeAllOpenSetting()
+        }
+
+        async function ajaxSettings(path, method, data){
+            var settings = {
+                "url": `http://localhost:3000/${path}`,
+                "method": method,
+                "timeout": 0,
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                "data": JSON.stringify(data),
+            };
+            return settings;
+        }
+
+        async function ajaxCall(settings){
+            return await new Promise(async (resolve, reject) => {
+                await $.ajax(settings).done(async function (response) {
+                    resolve(response);
+                });          
+            })
+        }
+
+        // render setting toolbar
+        $( ".setting-toolbar-selection" ).click(function() {
+            $(".setting-toolbar-box-background").css("display", `block`);
+            $(".setting-toolbar-box").css("display", `flex`);
+            var classList = $(this).attr('class').split(/\s+/);
+            $.each(classList, async function(index, item) {
+                if (item === 'fa-gear') {
+                    let data = {
+                        "uuid": localStorage.getItem('uuid'),
+                        "userEmail": localStorage.getItem('email')
+                    }
+                    let response = await ajaxCall(await ajaxSettings(`admin/menu/get`, 'POST', data))
+                    if(!response.status){
+                        $(".fa-gear").css("display", `none`);
+                    }else{
+                        for(const eachMenu of response.menu){
+                            $(".setting-toolbar-box").append(`<div class="menu ${eachMenu}" onclick="viewEdit(\'${eachMenu}\')">${eachMenu}</div>`)
+                        }
+                    }
+                }else if(item === 'account'){
+                    let data = {
+                        "uuid": localStorage.getItem('uuid'),
+                        "userEmail": localStorage.getItem('email')
+                    }
+                    let response = await ajaxCall(await ajaxSettings(`general/menu/account/get`, 'POST', data))
+                    if(response.status){
+                        for(const eachMenu of response.menu){
+                            $(".setting-toolbar-box").append(`<div class="menu ${eachMenu}" onclick="viewEdit(\'${eachMenu}\')">${eachMenu}</div>`)
+                        }
+                    }
+                }
+            });
+        });
+
+        // remove rendered setting toolbar
+        $( ".setting-toolbar-box-background" ).click(removeAllOpenSetting);
+        function removeAllOpenSetting() {
+            $(".setting-toolbar-box-background").css("display", `none`);
+            $(".setting-toolbar-box").css("display", `none`);
+            $(".general-modal").css("display", `none`);
+            $(".setting-toolbar-box").empty();
+        }
+
+        // render panel-container
+        $( ".panel-container-content-items" ).click(viewItemDetailsAndCustomizeToCart);
+        async function viewItemDetailsAndCustomizeToCart(itemSKU) {
+            $(".setting-toolbar-box-background").css("display", `block`);
+            $(".general-modal").css("display", `block`);
+            $(".general-modal").empty();
+            let data = {
+                "userEmail": localStorage.getItem('email'),
+                "uuid": localStorage.getItem('uuid'),
+                "page": 0,
+                "limit": 10,
+                "itemSKU": itemSKU
+            }
+            let response = await ajaxCall(await ajaxSettings(`admin/item/get`, 'POST', data))
+            console.log(response)
+            var parts = response.categories.itemName.split(' ')
+            var initials = ''
+            for (var i = 0; i < parts.length; i++) {
+                if (parts[i].length > 0 && parts[i] !== '') {
+                    initials += parts[i][0]
+                }
+            }
+            $(".general-modal").append(`
+                <div class="detailedItem">
+                    <div class="itemIcon">
+                        ${initials.toUpperCase()}
+                    </div>  
+                    <div class="itemActions">
+                        <div class="customInputsForAddToCart">
+                            <input type="number" placeholder="quantity" value=1 min=1 max=100>
+                            <input type="text" placeholder="add note">
+                        </div>
+                        <div class="add-to-cart">
+                            <p><i class="add-cross-button-icon fa fa-plus"></i></p> 
+                            add to cart
+                        </div>
+                    </div>  
+                    <div class="itemDetails">
+                        <div>
+                            Product name: ${response.categories.itemName}
+                        </div>
+                        <div>
+                            Sell price: ${response.categories.itemPrice}
+                        </div>
+                        <div>
+                            SKU: ${response.categories.itemSKU}
+                        </div>
+                        <div>
+                            Available stock: ${response.categories.itemStock}
+                        </div>
+                        <div>
+                            Description: ${response.categories.itemDesc}
+                        </div>
+                    </div>  
+                </div>
+            `)
+
+        }
+
+        // render header panel
+        $( ".panel-container-header-category-title" ).click(showItemsInCategory);
+        async function showItemsInCategory(a, categoryName){
+            $(".panel-container-header-category-title").css("background-color", `transparent`);
+            $(".panel-container-header-category-title").css("color", `black`);
+            $(a).css("background-color", `grey`);
+            $(a).css("color", `white`);
+            await showItemsInCategorySelected(categoryName)
+        }
+        async function showItemsInCategorySelected(categoryName){
+            // panel-container-content-items
+            let data = {
+                "userEmail": localStorage.getItem('email'),
+                "uuid": localStorage.getItem('uuid'),
+                "page": 0,
+                "limit": 10,
+                "categoryName": categoryName
+            }
+            let response = await ajaxCall(await ajaxSettings(`admin/category/get-item`, 'POST', data))
+            if(response.status){
+                $(".panel-container-content").empty()
+                for(const eachItem of response.items){
+                    var parts = eachItem.itemName.split(' ')
+                    var initials = ''
+                    for (var i = 0; i < parts.length; i++) {
+                        if (parts[i].length > 0 && parts[i] !== '') {
+                        initials += parts[i][0]
+                        }
+                    }
+                    $(".panel-container-content").append(
+                        `
+                            <div class="panel-container-content-items" onclick="viewItemDetailsAndCustomizeToCart(\'${eachItem.itemSKU}\')">
+                                <p class="initial">${initials.toUpperCase()}</p>
+                                <p>${eachItem.itemName}</p>
+                            </div>
+                        
+                        `
+                    )
+                }
+                $(".panel-container-content-items").css("height", $(".panel-container-content-items").width());
+            }
+        }
+
+        // checkout
+        $( ".checkout" ).click(function() {
+            $(".setting-toolbar-box-background").css("display", `block`);
+            $(".general-modal").css("display", `block`);
+        });
+    </script>
+
+
+</body>
+</html>
