@@ -140,7 +140,7 @@
         .panel-container-content{
             width: 100%;
             margin: 0.25%;
-            height: 93.5%;
+            height: 85.5%;
             background-color: whitesmoke;
             border-radius: var(--borderRadius);
             text-align: right;
@@ -164,6 +164,7 @@
             font-size: 140%;
             color: white;
             padding: 1%;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
         }
 
         .panel-container-content-items p{
@@ -203,19 +204,6 @@
             text-overflow: ellipsis; 
         }
 
-        .setting-toolbar{
-            position: fixed;
-            bottom: 1.5%;
-            left: 0.5%;
-            width:5vh;
-            padding: 0;
-            margin: 0;
-            font-size: 5vh;
-            border-radius: var(--borderRadius);
-            display: flex;
-            flex-direction: row;
-
-        }
         .setting-toolbar-box-background{
             position: fixed;
             background-color: rgba(0, 0, 0, 0.2);
@@ -311,12 +299,14 @@
             background-color: green;
             color: whitesmoke !important;
             border-radius: var(--borderRadius);
+            padding: 1.5%;
         }
 
         .cancel{
             background-color: darkred;
             color: whitesmoke !important;
             border-radius: var(--borderRadius);
+            padding: 1.5%;
         }
 
         .general-modal{
@@ -482,6 +472,30 @@
         .add-to-cart p{
             margin: 0;
         }
+
+        .panel-container-footer{
+            width: 100%;
+            height: 7.75%;
+            font-size: 140%;
+            margin: 0.25%;
+            background-color: darkolivegreen;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            justify-content: right;
+            border-radius: var(--borderRadius);
+        }
+        .panel-container-footer .menu{
+            width: 20%;
+            height: auto;
+            background-color: darkkhaki;
+            white-space: nowrap; 
+            overflow: hidden;
+            text-overflow: ellipsis; 
+            color: black;
+            text-align: center;
+            font-size: 100%;
+        }
     </style>
 </head>
 <body>
@@ -491,6 +505,26 @@
             <div class="panel-container-header">
             </div>
             <div class="panel-container-content">
+            </div>
+            <div class="panel-container-footer">
+                <div class="menu">
+                    order list
+                </div>
+                <div class="menu">
+                    paid list
+                </div>
+                <div class="menu">
+                    notepad
+                </div>
+                <div class="menu">
+                    calculator
+                </div>
+                <div class="menu setting-toolbar-selection general-account">
+                    account
+                </div>
+                <div class="menu setting-toolbar-selection admin-menu">
+                    admin menu
+                </div>
             </div>
         </div>
         <div class="checkout-container">
@@ -566,10 +600,6 @@
             </div>
 
         </div>
-        <div class="setting-toolbar">
-            <i class="setting-toolbar-selection fa fa-gear"></i>
-            <i class="setting-toolbar-selection fa account">&#xf007;</i>
-        </div>
         <div class="setting-toolbar-box-background">
         </div>
         <div class="setting-toolbar-box">
@@ -584,7 +614,6 @@
         $( document ).ready(async function() {
             await loadCart()
             // $(".panel-container-content").css("height", $(".panel-container-content").width());
-            $(".setting-toolbar").css("height", $(".setting-toolbar").width());
             let data = {
                 "userEmail": localStorage.getItem('email'),
                 "uuid": localStorage.getItem('uuid'),
@@ -1001,20 +1030,20 @@
             $(".setting-toolbar-box").css("display", `flex`);
             var classList = $(this).attr('class').split(/\s+/);
             $.each(classList, async function(index, item) {
-                if (item === 'fa-gear') {
+                if (item === 'admin-menu') {
                     let data = {
                         "uuid": localStorage.getItem('uuid'),
                         "userEmail": localStorage.getItem('email')
                     }
                     let response = await ajaxCall(await ajaxSettings(`admin/menu/get`, 'POST', data))
                     if(!response.status){
-                        $(".fa-gear").css("display", `none`);
+                        $(".admin-menu").css("display", `none`);
                     }else{
                         for(const eachMenu of response.menu){
                             $(".setting-toolbar-box").append(`<div class="menu ${eachMenu}" onclick="viewEdit(\'${eachMenu}\')">${eachMenu}</div>`)
                         }
                     }
-                }else if(item === 'account'){
+                }else if(item === 'general-account'){
                     let data = {
                         "uuid": localStorage.getItem('uuid'),
                         "userEmail": localStorage.getItem('email')
