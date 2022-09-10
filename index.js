@@ -133,6 +133,17 @@ let adminItemDELETEDTO = [
 app.post('/sign-up', async function (req, res, next) {
     const getObjectKeys = Object.keys(req.body)
     if (await arrayEquals(getObjectKeys, signUpDTO)){
+        for(const eachKey of getObjectKeys){
+            if(eachKey != "businessId"){
+                if((req.body[`${eachKey}`]).length <= 0){
+                    res.json({
+                        not_provided: eachKey,
+                        status: false
+                    })
+                    return 
+                }   
+            }
+        }
         const getSignUps = await getDb('signUps')
         if(getSignUps){
             const signUps = getSignUps
@@ -594,6 +605,368 @@ app.post('/general/menu/account/get', async function (req, res, next) {
     });
     return
 })
+
+// cart management
+
+let addToCartDTO = [
+    "userEmail",
+    "uuid",
+    "itemSKU",
+    "itemQuantity",
+    "itemNote"
+]
+
+let getCartDTO = [
+    "userEmail",
+    "uuid",
+]
+
+app.post('/cart/add', async function (req, res, next) {
+    const getObjectKeys = Object.keys(req.body)
+    if (await arrayEquals(getObjectKeys, addToCartDTO)){
+        const getLogins = await getDb('login')
+        if(getLogins){
+            const logins = getLogins
+            const checkExistingBusiness = logins.find(a=> a.userEmail === req.body.userEmail && a.uuid === req.body.uuid)
+            if(checkExistingBusiness){
+                if((req.body.itemQuantity * 1) <= 0){
+                    res.json({
+                        reason: `itemQuantity is less than 0`,
+                        status: false
+                    });
+                    return 
+                }
+                const getActiveCart = await getDb('cart')
+                const getExistingActiveCart = getActiveCart.find(a=> a.userEmail === req.body.userEmail && a.businessId === checkExistingBusiness.businessId)
+                if(getExistingActiveCart){
+                    const timeStamp = new Date()
+                    // check existing item
+                    const checkExistingItem = getExistingActiveCart.items.find(a=> a.itemSKU === req.body.itemSKU)
+                    if(checkExistingItem){
+                        let items = []
+                        for(const eachItem of getExistingActiveCart.items){
+                            if(eachItem.itemSKU === req.body.itemSKU){
+                                eachItem.itemQuantity = (req.body.itemQuantity * 1)
+                                eachItem.itemNote =  req.body.itemNote
+                            }
+                            items.push(eachItem)
+                        }
+                        getExistingActiveCart.items = items
+                        getExistingActiveCart.userEmail = req.body.userEmail;
+                        getExistingActiveCart.businessId = checkExistingBusiness.businessId;
+                        getExistingActiveCart.timeStamp = timeStamp;
+                        var db = NoSQL.load('./db/cart.nosql');
+                        await removeCart(getExistingActiveCart)
+                        db.insert(getExistingActiveCart)
+                        res.json({
+                            cart: getExistingActiveCart,
+                            status: true
+                        })
+                    }else{
+                        getExistingActiveCart.items.push({
+                            itemSKU: req.body.itemSKU,
+                            itemQuantity: req.body.itemQuantity,
+                            itemNote: req.body.itemNote
+                        })
+                        getExistingActiveCart.userEmail = req.body.userEmail;
+                        getExistingActiveCart.businessId = checkExistingBusiness.businessId;
+                        getExistingActiveCart.timeStamp = timeStamp;
+                        var db = NoSQL.load('./db/cart.nosql');
+                        await removeCart(getExistingActiveCart)
+                        db.insert(getExistingActiveCart)
+                        res.json({
+                            cart: getExistingActiveCart,
+                            status: true
+                        })
+                    }
+                }else{
+                    res.json({
+                        cart: await createNewCart(req.body, checkExistingBusiness.businessId),
+                        status: true
+                    })
+                }
+                return
+            }else{
+                res.json({
+                    reason: `user not found`,
+                    status: false
+                });
+            }
+            return
+        }
+    }
+    res.json({
+        status: false
+    });
+    return
+})
+
+app.post('/cart/edit', async function (req, res, next) {
+    const getObjectKeys = Object.keys(req.body)
+    if (await arrayEquals(getObjectKeys, addToCartDTO)){
+        const getLogins = await getDb('login')
+        if(getLogins){
+            const logins = getLogins
+            const checkExistingBusiness = logins.find(a=> a.userEmail === req.body.userEmail && a.uuid === req.body.uuid)
+            if(checkExistingBusiness){
+                const getActiveCart = await getDb('cart')
+                const getExistingActiveCart = getActiveCart.find(a=> a.userEmail === req.body.userEmail && a.businessId === checkExistingBusiness.businessId)
+                if(getExistingActiveCart){
+                    const timeStamp = new Date()
+                    // check existing item
+                    const checkExistingItem = getExistingActiveCart.items.find(a=> a.itemSKU === req.body.itemSKU)
+                    if(checkExistingItem){
+                        if((req.body.itemQuantity * 1) <=0){
+                            let items = []
+                            for(const eachItem of getExistingActiveCart.items){
+                                if(eachItem.itemSKU === req.body.itemSKU){
+
+                                }else{
+                                    items.push(eachItem)
+                                }
+                            }
+                            getExistingActiveCart.items = items
+                            getExistingActiveCart.userEmail = req.body.userEmail;
+                            getExistingActiveCart.businessId = checkExistingBusiness.businessId;
+                            getExistingActiveCart.timeStamp = timeStamp;
+                            var db = NoSQL.load('./db/cart.nosql');
+                            await removeCart(getExistingActiveCart)
+                            db.insert(getExistingActiveCart)
+                            res.json({
+                                cart: getExistingActiveCart,
+                                status: true
+                            })
+                        }else{
+                            let items = []
+                            for(const eachItem of getExistingActiveCart.items){
+                                if(eachItem.itemSKU === req.body.itemSKU){
+                                    eachItem.itemQuantity = (req.body.itemQuantity * 1)
+                                    eachItem.itemNote =  req.body.itemNote
+                                }
+                                items.push(eachItem)
+                            }
+                            getExistingActiveCart.items = items
+                            getExistingActiveCart.userEmail = req.body.userEmail;
+                            getExistingActiveCart.businessId = checkExistingBusiness.businessId;
+                            getExistingActiveCart.timeStamp = timeStamp;
+                            var db = NoSQL.load('./db/cart.nosql');
+                            await removeCart(getExistingActiveCart)
+                            db.insert(getExistingActiveCart)
+                            res.json({
+                                cart: getExistingActiveCart,
+                                status: true
+                            })
+                        }
+                    }else{
+                        res.json({
+                            reason: `item not found`,
+                            status: false
+                        });
+                    }
+                }else{
+                    res.json({
+                        reason: `cart not found`,
+                        status: false
+                    });
+                }
+                return
+            }else{
+                res.json({
+                    reason: `user not found`,
+                    status: false
+                });
+            }
+            return
+        }
+    }
+    res.json({
+        status: false
+    });
+    return
+})
+
+app.post('/cart/get', async function (req, res, next) {
+    const getObjectKeys = Object.keys(req.body)
+    if (await arrayEquals(getObjectKeys, getCartDTO)){
+        const getLogins = await getDb('login')
+        if(getLogins){
+            const logins = getLogins
+            const checkExistingBusiness = logins.find(a=> a.userEmail === req.body.userEmail && a.uuid === req.body.uuid)
+            if(checkExistingBusiness){
+                const getActiveCart = await getDb('cart')
+                const getExistingActiveCart = getActiveCart.find(a=> a.userEmail === req.body.userEmail && a.businessId === checkExistingBusiness.businessId)
+                if(getExistingActiveCart){
+                    res.json({
+                        cart: getExistingActiveCart,
+                        status: true
+                    })
+                }else{
+                    res.json({
+                        cart: "cart not found",
+                        status: false
+                    })
+                }
+                return
+            }else{
+                res.json({
+                    reason: `user not found`,
+                    status: false
+                });
+            }
+            return
+        }
+    }
+    res.json({
+        status: false
+    });
+    return
+})
+
+// tax management
+
+let editTaxDTO = [
+    "userEmail",
+    "uuid",
+    "tax"
+]
+
+app.post('/tax/edit', async function (req, res, next) {
+    const getObjectKeys = Object.keys(req.body)
+    if (await arrayEquals(getObjectKeys, editTaxDTO)){
+        const getLogins = await getDb('login')
+        if(getLogins){
+            if((req.body.tax * 1) <= 0){
+                res.json({
+                    reason: `tax is less than 0%`,
+                    status: false
+                });
+                return 
+            }
+            const logins = getLogins
+            const checkExistingBusiness = logins.find(a=> a.userEmail === req.body.userEmail && a.uuid === req.body.uuid && a.status === 'admin')
+            if(checkExistingBusiness){
+                const getBusinessTaxRegulation = await getDb('businessTaxRegulator')
+                const checkExistingBusinessTaxRegulation = getBusinessTaxRegulation.find(a=> a.businessId === checkExistingBusiness.businessId)
+                if(checkExistingBusinessTaxRegulation){
+                    checkExistingBusinessTaxRegulation.tax = (req.body.tax * 1)
+                }else{
+                    checkExistingBusinessTaxRegulation = {
+                        tax : (req.body.tax * 1),
+                        businessId
+                    }
+                }
+                var db = NoSQL.load('./db/businessTaxRegulator.nosql');
+                await removeTaxData(getExistingActiveCart)
+                db.insert(checkExistingBusinessTaxRegulation)
+                res.json({
+                    tax: checkExistingBusinessTaxRegulation,
+                    status: true
+                });
+                return
+            }else{
+                res.json({
+                    reason: `user not found`,
+                    status: false
+                });
+            }
+            return
+        }
+    }
+    res.json({
+        status: false
+    });
+    return
+})
+
+app.post('/tax/get', async function (req, res, next) {
+    const getObjectKeys = Object.keys(req.body)
+    if (await arrayEquals(getObjectKeys, editTaxDTO)){
+        const getLogins = await getDb('login')
+        if(getLogins){
+            if((req.body.tax * 1) <= 0){
+                res.json({
+                    reason: `tax is less than 0%`,
+                    status: false
+                });
+                return 
+            }
+            const logins = getLogins
+            const checkExistingBusiness = logins.find(a=> a.userEmail === req.body.userEmail && a.uuid === req.body.uuid && a.status === 'admin')
+            if(checkExistingBusiness){
+                const getBusinessTaxRegulation = await getDb('businessTaxRegulator')
+                const checkExistingBusinessTaxRegulation = getBusinessTaxRegulation.find(a=> a.businessId === checkExistingBusiness.businessId)
+                if(checkExistingBusinessTaxRegulation){
+                    res.json({
+                        tax: checkExistingBusinessTaxRegulation,
+                        status: true
+                    });
+                    return
+                }else{
+                    res.json({
+                        reason: `tax not found`,
+                        status: false
+                    });
+                    return
+                }
+            }else{
+                res.json({
+                    reason: `user not found`,
+                    status: false
+                });
+            }
+            return
+        }
+    }
+    res.json({
+        status: false
+    });
+    return
+})
+
+async function createNewCart(newData, businessId){
+    var db = NoSQL.load('./db/cart.nosql');
+    timeStamp = new Date()
+    let items = [];
+    items.push({
+        itemSKU: newData.itemSKU,
+        itemQuantity: newData.itemQuantity,
+        itemNote: newData.itemNote
+    })
+    let payload = {
+        userEmail: newData.userEmail,
+        businessId: businessId,
+        timeStamp,
+        items
+    }
+    await removeCart(newData)
+    db.insert(payload)
+    return payload
+}
+
+async function removeTaxData(newData){
+    var db = NoSQL.load('./db/businessTaxRegulator.nosql');
+    return await new Promise(async (resolve, reject) => {
+            db.remove().make(function(filter) {
+                filter.where('businessId', newData.businessId);
+                filter.callback(function(err, response) {
+                    resolve(response)
+                });
+        });
+    })
+}
+
+async function removeCart(newData){
+    var db = NoSQL.load('./db/cart.nosql');
+    return await new Promise(async (resolve, reject) => {
+            db.remove().make(function(filter) {
+                filter.where('userEmail', newData.userEmail);
+                filter.where('businessId', newData.businessId);
+                filter.callback(function(err, response) {
+                    resolve(response)
+                });
+        });
+    })
+}
 
 async function generateUID() {
     var firstPart = (Math.random() * 46656) | 0;

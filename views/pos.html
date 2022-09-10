@@ -100,20 +100,20 @@
             margin: var(--commonMargin);
         }
 
-        .checkout-table .checkout-table-content{
+        .checkout-table .checkout-table-content-row{
             display: flex;
             flex-direction: row;
             flex-wrap: nowrap;
         }
 
-        .checkout-table-content div{
+        .checkout-table-content-row div{
             color: black;
             text-align: center;
             width: 100%;
             margin: var(--commonMargin);
         }
 
-        .checkout-table-content .item-quantity{
+        .checkout-table-content-row .item-quantity{
             border: none;
             border-radius: var(--borderRadius);
             background-color: #888;
@@ -129,7 +129,7 @@
             border-radius: var(--borderRadius);
         }
 
-        .checkout-final .checkout-table-content{
+        .checkout-final .checkout-table-content-row{
             font-size: 3.5vh;
             height: 6vh;
             display: flex;
@@ -156,23 +156,25 @@
         }
 
         .panel-container-content-items{
-            width: 20%;
+            width: 18%;
             background-color: green;
             border-radius: var(--borderRadius);
             margin: 0.25%;
             text-align: center;
             font-size: 140%;
             color: white;
+            padding: 1%;
         }
 
         .panel-container-content-items p{
             white-space: nowrap; 
             overflow: hidden;
-            text-overflow: ellipsis; 
+            font-size: 1.5vw;
+            margin: 0;
         }
 
         .panel-container-content-items .initial{
-            font-size: 340%;
+            font-size: 6vw;
             margin: 0;
             color: white;
         }
@@ -299,11 +301,10 @@
 
         .add-cross-button-icon{
             color: white;
-            position: relative;
-            top: 50%;
             border: none;
             width: 100%;
-            font-size: x-large;
+            font-size: 7vw;
+            margin: 0;
         }
         
         .checkout{
@@ -417,8 +418,11 @@
             border: none;
             border-radius: var(--borderRadius);
             box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
-            font-size: 540%;
+            font-size: 10vw;
             margin: var(--commonMargin);
+            white-space: nowrap; 
+            overflow: hidden;
+            text-overflow: ellipsis; 
         }
 
         .detailedItem .itemDetails{
@@ -436,7 +440,6 @@
 
         .detailedItem .itemActions{
             width: 64%;
-            height: 30%;
             background-color: lightgray;
             color: black;
             border: none;
@@ -467,12 +470,17 @@
             border: none;
             border-radius: var(--borderRadius);
             margin-top: 1%;
-            width: 100%;
+            width: 98%;
         }
 
         .itemActions .add-to-cart{
             background-color: green;
             width: 100%;
+            font-size: 2vw;
+        }
+
+        .add-to-cart p{
+            margin: 0;
         }
     </style>
 </head>
@@ -483,18 +491,6 @@
             <div class="panel-container-header">
             </div>
             <div class="panel-container-content">
-                <div class="panel-container-content-items">
-
-                </div>
-                <div class="panel-container-content-items">
-
-                </div>
-                <div class="panel-container-content-items">
-
-                </div>
-                <div class="panel-container-content-items">
-
-                </div>
             </div>
         </div>
         <div class="checkout-container">
@@ -512,20 +508,22 @@
                 </div>
                 <!--  -->
                 <div class="checkout-table-content">
-                    <div>
-                        <input class="item-quantity" type="number" min="0" max="100"></input>
-                    </div>
-                    <div>
-                        Product Name
-                    </div>
-                    <div>
-                        Price
+                    <div class="checkout-table-content-row">
+                        <div>
+                            <input class="item-quantity" type="number" min="0" max="100"></input>
+                        </div>
+                        <div>
+                            Product Name
+                        </div>
+                        <div>
+                            Price
+                        </div>
                     </div>
                 </div>
             </div>
 
             <div class="checkout-final">
-                <div class="checkout-table-content">
+                <div class="checkout-table-content-row">
                     <div>
                         Sub-total
                     </div>
@@ -533,7 +531,7 @@
                         0
                     </div>
                 </div>
-                <div class="checkout-table-content">
+                <div class="checkout-table-content-row">
                     <div>
                         Tax
                     </div>
@@ -541,7 +539,7 @@
                         0
                     </div>
                 </div>
-                <div class="checkout-table-content">
+                <div class="checkout-table-content-row">
                     <div>
                         Tip
                     </div>
@@ -549,7 +547,7 @@
                         0
                     </div>
                 </div>
-                <div class="checkout-table-content">
+                <div class="checkout-table-content-row">
                     <div>
                         Total
                     </div>
@@ -557,7 +555,7 @@
                         0
                     </div>
                 </div>
-                <div class="checkout-table-content">
+                <div class="checkout-table-content-row">
                     <div class="checkout">
                         Checkout
                     </div>
@@ -584,6 +582,7 @@
 
     <script>
         $( document ).ready(async function() {
+            await loadCart()
             // $(".panel-container-content").css("height", $(".panel-container-content").width());
             $(".setting-toolbar").css("height", $(".setting-toolbar").width());
             let data = {
@@ -605,6 +604,136 @@
             }
         });
 
+        async function loadCart(){
+            $(".checkout-table-content").empty()
+            let data = {
+                "userEmail": localStorage.getItem('email'),
+                "uuid": localStorage.getItem('uuid'),
+            }
+            let response = await ajaxCall(await ajaxSettings(`cart/get`, 'POST', data))
+            if(response.status){
+                for(const eachItem of response.cart.items){
+                    data = {
+                        "userEmail": localStorage.getItem('email'),
+                        "uuid": localStorage.getItem('uuid'),
+                        "page": 0,
+                        "limit": 10,
+                        "itemSKU": eachItem.itemSKU
+                    }
+                    let itemDetails = await ajaxCall(await ajaxSettings(`admin/item/get`, 'POST', data))
+                    console.log(itemDetails)
+                    if(itemDetails.status){
+                        $(".checkout-table-content").append(
+                            `
+                            <div class="checkout-table-content-row">
+                                <div>
+                                    <input class="item-quantity" type="number" min="0" max="100" value=${eachItem.itemQuantity} onchange="changeCartItemQuantity(\'${eachItem.itemSKU}\', this)"></input>
+                                </div>
+                                <div class="selectedItemName" onclick="editSelectedItemInCart(\'${eachItem.itemSKU}\', \'${eachItem.itemNote}\', \'${eachItem.itemQuantity}\')">
+                                    ${itemDetails.categories.itemName}
+                                </div>
+                                <div class="selectedItemPrices">
+                                    ${(itemDetails.categories.itemPrice * 1) * (eachItem.itemQuantity *1)}
+                                </div>
+                            </div>
+                            `
+                        )
+                    }
+
+                }
+                await accumulatePrices()
+            }
+        }
+
+        async function editSelectedItemInCart(itemSKU, itemNote, itemQuantity){
+            $(".setting-toolbar-box-background").css("display", `block`);
+            $(".general-modal").css("display", `block`);
+            $(".general-modal").empty();
+            data = {
+                "userEmail": localStorage.getItem('email'),
+                "uuid": localStorage.getItem('uuid'),
+                "page": 0,
+                "limit": 10,
+                "itemSKU": itemSKU
+            }
+            let itemDetails = await ajaxCall(await ajaxSettings(`admin/item/get`, 'POST', data))
+            console.log(itemDetails)
+            if(itemDetails.status){
+                $(".general-modal").append(`
+                    <div class="detailedItem">
+                        <div class="itemDetails">
+                            <div>
+                                Product name: ${itemDetails.categories.itemName}
+                            </div>
+                            <br>
+                            <div class="customInputsForAddToCart">
+                                Note: <input class="editedSelectedItemInCart" type="text" placeholder="add note" value="${itemNote}">
+                            </div>
+                            <br>
+                            <div class="add-to-cart" onclick="editItemNoteInCart(\'${itemDetails.categories.itemSKU}\', \'${itemQuantity}\')"> 
+                                edit and save
+                            </div>
+                        </div>  
+                    </div>
+                `)
+            }
+        }
+
+        async function editItemNoteInCart(itemSKU, itemQuantity){
+            let data = {
+                "userEmail": localStorage.getItem('email'),
+                "uuid": localStorage.getItem('uuid'),
+                "itemSKU": itemSKU,
+                "itemQuantity": itemQuantity,
+                "itemNote": $(".editedSelectedItemInCart").val(),
+            }
+            let response = await ajaxCall(await ajaxSettings(`cart/add`, 'POST', data))
+            if(response.status){
+                $(".general-modal").empty();
+                $(".general-modal").append(`
+                    <div class="detailedItem">
+                        <div class="itemDetails">
+                            <div>
+                                Status: added
+                            </div>
+                        </div>  
+                    </div>
+                `)
+                for(const eachItem of response.cart.items){
+                    $(".itemDetails").append(`
+                        <div>
+                            <p>SKU: ${eachItem.itemSKU}</p>
+                            <p>Quantity: ${eachItem.itemQuantity}</p>
+                            <p>Note: ${eachItem.itemNote}</p>
+                        </div>
+                    `)
+                }
+            }
+            await loadCart()
+        }
+
+        async function accumulatePrices(){
+            let total = 0;
+            $('.selectedItemPrices').each(function(i, obj) {
+                total = total + $(this).html() * 1
+            });
+            $(".subTotal").html(total)
+        }
+
+        async function changeCartItemQuantity(itemSKU, obj){
+            let data = {
+                "userEmail": localStorage.getItem('email'),
+                "uuid": localStorage.getItem('uuid'),
+                "itemSKU": itemSKU,
+                "itemQuantity": $(obj).val(),
+                "itemNote": "",
+            }
+            let response = await ajaxCall(await ajaxSettings(`cart/edit`, 'POST', data))
+            if(response.status){
+                await loadCart()
+            }
+        }
+        
         async function viewEdit(selected) {
             if(selected.includes('categories')){
                 let data = {
@@ -842,6 +971,7 @@
             }
             let response = await ajaxCall(await ajaxSettings(`admin/category`, 'POST', data))
             removeAllOpenSetting()
+            window.location.href = "./pos";
         }
 
         async function ajaxSettings(path, method, data){
@@ -937,10 +1067,10 @@
                     </div>  
                     <div class="itemActions">
                         <div class="customInputsForAddToCart">
-                            <input type="number" placeholder="quantity" value=1 min=1 max=100>
-                            <input type="text" placeholder="add note">
+                            <input class="requestedItemQuantity" type="number" placeholder="quantity" value=1 min=1 max=100>
+                            <input class="requestedItemNote" type="text" placeholder="add note">
                         </div>
-                        <div class="add-to-cart">
+                        <div class="add-to-cart" onclick="addItemToCart(\'${response.categories.itemSKU}\')">
                             <p><i class="add-cross-button-icon fa fa-plus"></i></p> 
                             add to cart
                         </div>
@@ -1006,7 +1136,7 @@
                         `
                     )
                 }
-                $(".panel-container-content-items").css("height", $(".panel-container-content-items").width());
+                // $(".panel-container-content-items").css("height", $(".panel-container-content-items").width());
             }
         }
 
@@ -1015,6 +1145,55 @@
             $(".setting-toolbar-box-background").css("display", `block`);
             $(".general-modal").css("display", `block`);
         });
+
+
+        async function addItemToCart(itemSKU){
+            if(!isNaN($(".requestedItemQuantity").val())){
+                if($(".requestedItemQuantity").val() > 0){
+                    let data = {
+                        "userEmail": localStorage.getItem('email'),
+                        "uuid": localStorage.getItem('uuid'),
+                        "itemSKU": itemSKU,
+                        "itemQuantity": $(".requestedItemQuantity").val(),
+                        "itemNote": $(".requestedItemNote").val(),
+                    }
+                    let response = await ajaxCall(await ajaxSettings(`cart/add`, 'POST', data))
+                    if(response.status){
+                        $(".general-modal").empty()
+                        $(".general-modal").append(`
+                            <div class="detailedItem">
+                                <div class="itemDetails">
+                                    <div>
+                                        Status: added
+                                    </div>
+                                </div>  
+                            </div>
+                        `)
+                        for(const eachItem of response.cart.items){
+                            $(".itemDetails").append(`
+                                <div>
+                                    <p>SKU: ${eachItem.itemSKU}</p>
+                                    <p>Quantity: ${eachItem.itemQuantity}</p>
+                                    <p>Note: ${eachItem.itemNote}</p>
+                                </div>
+                            `)
+                        }
+                    }else{
+                        $(".general-modal").empty()
+                        $(".general-modal").append(`
+                            <div class="detailedItem">
+                                <div class="itemDetails">
+                                    <div>
+                                        Status: fail to add
+                                    </div>
+                                </div>  
+                            </div>
+                        `)
+                    }
+                }
+            }
+            await loadCart()
+        }
     </script>
 
 

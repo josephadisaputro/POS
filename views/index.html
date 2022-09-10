@@ -134,6 +134,7 @@
             color: whitesmoke;
             padding: 1%;
             transition: var(--commonTransition);
+            transition: 1s;
         }
 
         .left-container .submitButton{
@@ -142,21 +143,29 @@
         }
 
         .right-container .submitButton{
-            float: left;
+            position: relative;
+            left: 0;
+            width: fit-content;
             border-radius: 0 var(--borderRadius) var(--borderRadius) 0;
+            margin-top: var(--commonMargin);
         }
 
         .right-container .forgotBusinessId{
-            float: right;
-            border-radius: var(--borderRadius) 0 0 var(--borderRadius);
+            position: relative;
+            left: 0;
+            width: fit-content;
+            border-radius: 0 var(--borderRadius) var(--borderRadius) 0;
+            margin-top: var(--commonMargin);
             background-color: darkgoldenrod;
         }
 
         .right-container .forgotPassword{
-            float: right;
-            border-radius: var(--borderRadius) 0 0 var(--borderRadius);
-            background-color: darkolivegreen;
+            position: relative;
+            left: 0;
+            width: fit-content;
+            border-radius: 0 var(--borderRadius) var(--borderRadius) 0;
             margin-top: var(--commonMargin);
+            background-color: darkolivegreen;
         }
 
         .submitButton:hover{
@@ -269,6 +278,10 @@
     <script>
         $( ".submitButton" ).click(function() {
             var classList = $(this).attr('class').split(/\s+/);
+            $(this).css("width", "80%")
+            setTimeout(() => {
+                $(this).css("width", "fit-content")
+            }, 1000);
             $.each(classList, async function(index, item) {
                 if (item === 'login') {
                     // window.location.href = "./pos";
@@ -277,17 +290,26 @@
                         "userPassword": $( ".passwordLogin" ).val(),
                         "businessId": $( ".businessIdLogin" ).val()
                     }
-
-                    console.log(data)
-
                     let response = await ajaxCall(await ajaxSettings('login', 'POST', data))
                     if(response.uuid && response.status){
                         localStorage.setItem("uuid", response.uuid);
                         localStorage.setItem("email", $( ".emailLogin" ).val());
+                        $( ".loading-area" ).css("display", "block")
+                        $( ".success-loading-area" ).css("display", "table")
+                        setTimeout(() => {
+                            $( ".loading-area" ).css("display", "none")
+                            $( ".success-loading-area" ).css("display", "none")
+                        }, 2000);
                         window.location.href = "./pos";
                     }else{
                         localStorage.setItem("uuid", '');
                         localStorage.setItem("email", '');
+                        $( ".loading-area" ).css("display", "block")
+                        $( ".failed-loading-area" ).css("display", "table")
+                        setTimeout(() => {
+                            $( ".loading-area" ).css("display", "none")
+                            $( ".failed-loading-area" ).css("display", "none")
+                        }, 2000);
                     }
                 }else if(item === 'signup'){
                     let data = {
@@ -298,9 +320,6 @@
                         "userPassword": $( ".userPassword" ).val(),
                         "businessId": $( ".businessIdSignUp" ).val()? $( ".businessIdSignUp" ).val() : null
                     }
-
-                    console.log(data)
-
                     let response = await ajaxCall(await ajaxSettings('sign-up', 'POST', data))
                     if(response.businessId){
                         $( ".emailLogin" ).val(`${$( ".userEmail" ).val()}`)
