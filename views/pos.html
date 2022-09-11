@@ -742,11 +742,21 @@
         }
 
         async function accumulatePrices(){
+            data = {
+                "userEmail": localStorage.getItem('email'),
+                "uuid": localStorage.getItem('uuid'),
+                "tax": 0
+            }
+            response = await ajaxCall(await ajaxSettings(`tax/get`, 'POST', data))
+            if(response.status){
+                $(".tax").html(`${response.tax.tax? response.tax.tax: 0}%`)
+            }
             let total = 0;
             $('.selectedItemPrices').each(function(i, obj) {
                 total = total + $(this).html() * 1
             });
             $(".subTotal").html(total)
+            response.tax.tax? $(".total").html(total + (total*response.tax.tax/100)): $(".total").html(total)
         }
 
         async function changeCartItemQuantity(itemSKU, obj){
@@ -827,6 +837,71 @@
                 if(response.status){
                     window.location.href = "./";
                 }
+            } else if(selected.includes('tax')){
+                let data = {
+                    "userEmail": localStorage.getItem('email'),
+                    "uuid": localStorage.getItem('uuid'),
+                    "tax": 0
+                }
+                let response = await ajaxCall(await ajaxSettings(`tax/get`, 'POST', data))
+                $(".setting-toolbar-box-background").css("display", `block`);
+                $(".general-modal").css("display", `block`);
+                $(".general-modal").empty();
+                $(".general-modal").append(`
+                    <div class="detailedItem">  
+                        <div class="itemDetails">
+                            <div>
+                                Recorded percentage tax amount: ${response.tax.tax? response.tax.tax: 0}%
+                            </div>
+                            <div>
+                                <div class="itemActions">
+                                    <div class="customInputsForAddToCart">
+                                        <input class="updatedTaxPercentageAmount" type="number" placeholder="quantity" value=10 min=1 max=100>
+                                    </div>
+                                    <div class="add-to-cart" onclick="updateTaxPercentageAmountSetting()">
+                                        save new tax percentage amount
+                                    </div>
+                                </div> 
+                            </div>
+                        </div>  
+                    </div>
+                `)
+            }
+        }
+
+        async function updateTaxPercentageAmountSetting(){
+            let data = {
+                "userEmail": localStorage.getItem('email'),
+                "uuid": localStorage.getItem('uuid'),
+                "tax": $(".updatedTaxPercentageAmount").val()
+            }
+            let response = await ajaxCall(await ajaxSettings(`tax/edit`, 'POST', data))
+            if(response.status){
+                $(".setting-toolbar-box-background").css("display", `block`);
+                $(".general-modal").css("display", `block`);
+                $(".general-modal").empty();
+                $(".general-modal").append(`
+                    <div class="detailedItem">  
+                        <div class="itemDetails">
+                            <div>
+                                new edited percentage tax amount is succesfully saved, recorded: ${response.tax.tax? response.tax.tax: 0}%
+                            </div>
+                        </div>  
+                    </div>
+                `)
+            }else{
+                $(".setting-toolbar-box-background").css("display", `block`);
+                $(".general-modal").css("display", `block`);
+                $(".general-modal").empty();
+                $(".general-modal").append(`
+                    <div class="detailedItem">  
+                        <div class="itemDetails">
+                            <div>
+                                new edited percentage tax amount is failed to save, recorded: ${response.tax.tax? response.tax.tax: 0}%
+                            </div>
+                        </div>  
+                    </div>
+                `)
             }
         }
 
@@ -855,8 +930,7 @@
                 console.log(response)
                 if(response.status){
                     $(".setting-toolbar-box").append(`
-                        <input class="input-general-pop-up-setting itemSKU" type="text" value="${response.categories.itemSKU}">
-                        </input>
+                    <input class="input-general-pop-up-setting itemSKU" type="text" value="${response.categories.itemSKU}">
                         <input class="input-general-pop-up-setting itemName" type="text" value="${response.categories.itemName}">
                         </input>
                         <input class="input-general-pop-up-setting itemName" type="text" value="${response.categories.itemPrice}">

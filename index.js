@@ -58,6 +58,7 @@ let adminMenus = [
     "view/edit categories",
     "view/edit items",
     "view businessId",
+    "view/edit tax settings"
 ]
 
 let adminCategoryGETDTO = [
@@ -846,17 +847,17 @@ app.post('/tax/edit', async function (req, res, next) {
             const checkExistingBusiness = logins.find(a=> a.userEmail === req.body.userEmail && a.uuid === req.body.uuid && a.status === 'admin')
             if(checkExistingBusiness){
                 const getBusinessTaxRegulation = await getDb('businessTaxRegulator')
-                const checkExistingBusinessTaxRegulation = getBusinessTaxRegulation.find(a=> a.businessId === checkExistingBusiness.businessId)
+                let checkExistingBusinessTaxRegulation = getBusinessTaxRegulation.find(a=> a.businessId === checkExistingBusiness.businessId)
                 if(checkExistingBusinessTaxRegulation){
                     checkExistingBusinessTaxRegulation.tax = (req.body.tax * 1)
                 }else{
                     checkExistingBusinessTaxRegulation = {
                         tax : (req.body.tax * 1),
-                        businessId
+                        businessId: checkExistingBusiness.businessId
                     }
                 }
                 var db = NoSQL.load('./db/businessTaxRegulator.nosql');
-                await removeTaxData(getExistingActiveCart)
+                await removeTaxData(checkExistingBusinessTaxRegulation)
                 db.insert(checkExistingBusinessTaxRegulation)
                 res.json({
                     tax: checkExistingBusinessTaxRegulation,
@@ -883,13 +884,6 @@ app.post('/tax/get', async function (req, res, next) {
     if (await arrayEquals(getObjectKeys, editTaxDTO)){
         const getLogins = await getDb('login')
         if(getLogins){
-            if((req.body.tax * 1) <= 0){
-                res.json({
-                    reason: `tax is less than 0%`,
-                    status: false
-                });
-                return 
-            }
             const logins = getLogins
             const checkExistingBusiness = logins.find(a=> a.userEmail === req.body.userEmail && a.uuid === req.body.uuid && a.status === 'admin')
             if(checkExistingBusiness){
@@ -908,6 +902,145 @@ app.post('/tax/get', async function (req, res, next) {
                     });
                     return
                 }
+            }else{
+                res.json({
+                    reason: `user not found`,
+                    status: false
+                });
+            }
+            return
+        }
+    }
+    res.json({
+        status: false
+    });
+    return
+})
+
+// checkout management
+
+let editCheckoutDTO = [
+    "userEmail",
+    "uuid",
+    "totalAmount",
+    "subTotal",
+    "items",
+    "totalQuantity",
+    "paymentMethod",
+    "isSalesOrderPending"
+]
+
+let getCheckoutDTO = [
+    "userEmail",
+    "uuid",
+    "salesOrderId",
+]
+app.post('/checkout/add', async function (req, res, next) {
+    const getObjectKeys = Object.keys(req.body)
+    if (await arrayEquals(getObjectKeys, editCheckoutDTO)){
+        const getLogins = await getDb('login')
+        if(getLogins){
+            if((req.body.totalAmount * 1) <= 0 || (req.body.subTotal * 1) <= 0 || (req.body.totalQuantity * 1) <= 0){
+                res.json({
+                    reason: `totalAmount/subTotal/totalQuantity is less than 0`,
+                    status: false
+                });
+                return 
+            }
+            const logins = getLogins
+            const checkExistingBusiness = logins.find(a=> a.userEmail === req.body.userEmail && a.uuid === req.body.uuid && a.status === 'admin')
+            if(checkExistingBusiness){
+                var db = NoSQL.load('./db/salesOrders.nosql');
+                req.body.salesOrderId = await generateUID()
+                req.body.timeStamp = new Date()
+                req.body.paidStatus = false
+                req.body.businessId = checkExistingBusiness.businessId
+                db.insert(req.body)
+                res.json({
+                    salesOrder: req.body,
+                    status: true
+                });
+                return
+            }else{
+                res.json({
+                    reason: `user not found`,
+                    status: false
+                });
+            }
+            return
+        }
+    }
+    res.json({
+        status: false
+    });
+    return
+})
+
+app.post('/checkout/get', async function (req, res, next) {
+    const getObjectKeys = Object.keys(req.body)
+    if (await arrayEquals(getObjectKeys, getCheckoutDTO)){
+        const getLogins = await getDb('login')
+        if(getLogins){
+            const logins = getLogins
+            const checkExistingBusiness = logins.find(a=> a.userEmail === req.body.userEmail && a.uuid === req.body.uuid && a.status === 'admin')
+            if(checkExistingBusiness){
+                const getSalesOrders = await getDb('salesOrders')
+                if(req.body.salesOrderId){
+                    const checkSalesOrderId = getSalesOrders.filter(a=> a.salesOrderId === req.body.salesOrderId && a.uuid === req.body.uuid && a.businessId === checkExistingBusiness.businessId)
+                    checkSalesOrderId = checkSalesOrderId.slice(req.body.page,req.body.page+req.body.limit)
+                    res.json({
+                        salesOrder: checkSalesOrderId,
+                        status: true
+                    });
+                }else{
+                    const checkSalesOrders = getSalesOrders.filter(a.uuid === req.body.uuid && a.businessId === checkExistingBusiness.businessId)
+                    checkSalesOrders = checkSalesOrders.slice(req.body.page,req.body.page+req.body.limit)
+                    res.json({
+                        salesOrder: getSalesOrders,
+                        status: true
+                    });
+                }
+                return
+            }else{
+                res.json({
+                    reason: `user not found`,
+                    status: false
+                });
+            }
+            return
+        }
+    }
+    res.json({
+        status: false
+    });
+    return
+})
+
+app.post('/checkout/admin/get', async function (req, res, next) {
+    const getObjectKeys = Object.keys(req.body)
+    if (await arrayEquals(getObjectKeys, getCheckoutDTO)){
+        const getLogins = await getDb('login')
+        if(getLogins){
+            const logins = getLogins
+            const checkExistingBusiness = logins.find(a=> a.userEmail === req.body.userEmail && a.uuid === req.body.uuid && a.status === 'admin')
+            if(checkExistingBusiness){
+                const getSalesOrders = await getDb('salesOrders')
+                if(req.body.salesOrderId){
+                    const checkSalesOrderId = getSalesOrders.filter(a=> a.salesOrderId === req.body.salesOrderId && a.businessId === checkExistingBusiness.businessId)
+                    checkSalesOrderId = checkSalesOrderId.slice(req.body.page,req.body.page+req.body.limit)
+                    res.json({
+                        salesOrder: checkSalesOrderId,
+                        status: true
+                    });
+                }else{
+                    const checkSalesOrders = getSalesOrders.filter(a.businessId === checkExistingBusiness.businessId)
+                    checkSalesOrders = checkSalesOrders.slice(req.body.page,req.body.page+req.body.limit)
+                    res.json({
+                        salesOrder: getSalesOrders,
+                        status: true
+                    });
+                }
+                return
             }else{
                 res.json({
                     reason: `user not found`,
