@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Checkout</title>
+    <style>
+        /* width */
+        ::-webkit-scrollbar {
+            width: 0%;
+        }
+
+        .mainPanel{
+            display: flex;
+            flex-direction: column;
+            flex-wrap: nowrap;
+            width: 100%;
+            height: 97.5vh;
+            border-radius: 10px;
+            border: none;
+            background-color: grey;
+        }
+        .topPanel{
+            width: 98%;
+            height: 70%;
+            padding: 1%;
+            border-radius: 10px 10px 0 0;
+            border: none;
+            background-color: lightseagreen;
+            overflow-y: scroll;
+        }
+        .bottomPanel{
+            width: 98%;
+            height: 30%;
+            padding: 1%;
+            border-radius: 0 0 10px 10px;
+            border: none;
+            background-color: darkslategray;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+        }
+
+        .panel{
+            width: 48%;
+            height: auto;
+            background-color: darkolivegreen;
+            border-radius: 10px;
+            border: none;
+            margin-left: 1%;
+            margin-right: 1%;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            padding: 1%;
+        }
+
+        .table{
+            display: flex;
+            flex-direction: column;
+            flex-wrap: nowrap;
+            overflow-x: scroll;
+            margin: 0;
+            background-color: grey;
+            border-radius: 10px;
+            border: none;
+        }
+
+        .taskbar{
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            margin: 0;
+            background-color: grey;
+            border-radius: 10px;
+            border: none;
+            padding: 1%;
+            margin-bottom: 1%;
+        }
+
+        .rowHead .column{
+            background-color: darkolivegreen;
+            border-radius: 10px;
+            border: none;
+            color: whitesmoke;
+        }
+
+        .row{
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            margin: 0;
+        }
+
+        .column{
+            margin: 1%;
+            border-radius: 10px;
+            border: none;
+            background-color: aquamarine;
+            width: 20%;
+            min-width: 20%;
+            max-width: 20%;
+            padding: 1%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .taskbar .column{
+            margin: 1%;
+            border-radius: 10px;
+            border: none;
+            background-color: whitesmoke;
+            width: fit-content !important; 
+            min-width: fit-content !important; 
+            max-width: fit-content !important; 
+            padding: 1%;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+        }
+
+        .generalButton{
+            width: fit-content;
+            background-color: green;
+            color: whitesmoke;
+            border-radius: 5px;
+            border: none;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            padding: 2%;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="mainPanel">
+        <div class="topPanel">
+            <div class="taskbar">
+                <div class="column">
+                    back to POS
+                </div>
+                <div class="column">
+                    refresh table
+                </div>
+                <div class="column">
+                    download the table below
+                </div>
+            </div>
+            <div class="table">
+                <div class="row rowHead">
+                    <div class="column">
+                        as
+                        <span class="generalButton">
+                            click
+                        </span>
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                    <div class="column">
+                        asdasdasdasdasdasdasasdasdasdasda
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="bottomPanel">
+            <div class="panel">
+
+            </div>
+            <div class="panel">
+
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
