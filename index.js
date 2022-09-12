@@ -3,6 +3,9 @@ const app = express()
 var cors = require('cors')
 var axios = require('axios')
 var NoSQL = require('nosql')
+var http = require('http');
+var fileSystem = require('fs');
+var path = require('path');
 require('dotenv').config()
 const port = 3000
 
@@ -1070,6 +1073,94 @@ app.post('/checkout/admin/get', async function (req, res, next) {
     });
     return
 })
+
+app.post('/checkout/download/excel', async function (req, res, next) {
+    const getObjectKeys = Object.keys(req.body)
+    console.log(getObjectKeys)
+    if (await arrayEquals(getObjectKeys, getCheckoutDTO)){
+        const getLogins = await getDb('login')
+        if(getLogins){
+            const logins = getLogins
+            const checkExistingBusiness = logins.find(a=> a.userEmail === req.body.userEmail && a.uuid === req.body.uuid && a.status === 'admin')
+            if(checkExistingBusiness){
+                const getSalesOrders = await getDb('salesOrders')
+                if(req.body.salesOrderId){
+                    if(req.body.salesOrderId !="null"){
+                        let checkSalesOrderId = getSalesOrders.filter(a=> a.salesOrderId === req.body.salesOrderId && a.uuid === req.body.uuid && a.businessId === checkExistingBusiness.businessId)
+                        await downloadToExcel(null, checkSalesOrders, null, checkExistingBusiness.businessId)
+                        res.json({
+                            salesOrder: checkSalesOrderId,
+                            status: true
+                        });
+                        return
+                    }
+                }
+                let checkSalesOrders = getSalesOrders.filter(a=> a.uuid === req.body.uuid && a.businessId === checkExistingBusiness.businessId)
+                await downloadToExcel(null, checkSalesOrders, null, checkExistingBusiness.businessId)
+                await responseFileToBeDownloaded(res, `SalesOrder-${checkExistingBusiness.businessId}`)
+                return
+            }else{
+                res.json({
+                    reason: `user not found`,
+                    status: false
+                });
+            }
+            return
+        }
+    }
+    res.json({
+        status: false
+    });
+    return
+})
+
+async function responseFileToBeDownloaded(res, fileName){
+    var filePath = path.join(__dirname, `${fileName}.xlsx`);
+    var stat = fileSystem.statSync(filePath);
+
+    res.writeHead(200, {
+        'Content-Type': 'application/vnd.ms-excel',
+        'Content-Length': stat.size
+    });
+
+    var readStream = fileSystem.createReadStream(filePath);
+    // We replaced all the event handlers with a simple call to readStream.pipe()
+    readStream.pipe(res);
+    return
+}
+
+async function callbackResponse(sheet){
+    // console.log("Download complete:", sheet)
+    return
+}
+
+async function downloadToExcel(headingColumnNames, datas, fromDate, businessId, res){
+    let xlsx = require("json-as-xlsx")
+    // Object.keys(req.body)
+    let today = new Date()
+    let columns = []
+    console.log(datas)
+    for(const eachCol of Object.keys(datas[0])){
+        columns.push(
+            { label: eachCol, value: (row) => row[`${eachCol}`]}
+        )
+    }
+    let data = [
+        {
+            sheet: `${fromDate?fromDate:"SO"}`,
+            columns: columns,
+            content: datas,
+        },
+    ]
+
+    let settings = {
+        fileName: `SalesOrder-${businessId}`, // Name of the resulting spreadsheet
+        extraLength: 3, // A bigger number means that columns will be wider
+        writeOptions: {}, // Style options from https://github.com/SheetJS/sheetjs#writing-options
+    }
+      
+    return xlsx(data, settings, callbackResponse)
+}
 
 async function createNewCart(newData, businessId){
     var db = NoSQL.load('./db/cart.nosql');

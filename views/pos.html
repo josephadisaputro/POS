@@ -557,10 +557,13 @@
 
         .menu iframe{
             position: fixed;
-            top: 5%;
+            top: 10%;
             left: 50%;
             margin-left: -25%;
             display: none;
+            border: none;
+            background-color: transparent;
+            z-index: 3;
         }
     </style>
 </head>
@@ -692,8 +695,10 @@
 
         async function unhideCalculator(id){
             if($("#"+id).css("display") == "block"){
+                $(".setting-toolbar-box-background").css("display", `none`);
                 $("#"+id).css("display", "none")
             }else{
+                $(".setting-toolbar-box-background").css("display", `block`);
                 $("#"+id).css("display", "block")
                 var frame = document.getElementById(id);
                 frame.style.height = 
@@ -1238,6 +1243,7 @@
             $(".setting-toolbar-box").css("display", `none`);
             $(".general-modal").css("display", `none`);
             $(".setting-toolbar-box").empty();
+            $("#Iframe").css("display", "none")
         }
 
         // render panel-container
