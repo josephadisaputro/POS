@@ -23,6 +23,10 @@ app.get('/checkout', function (req, res, next) {
     res.sendFile(viewDir + 'checkout.html');
 })
 
+app.get('/calculator', function (req, res, next) {
+    res.sendFile(viewDir + 'calculator.html');
+})
+
 let signUpDTO = [
     "businessName",
     "businessAddress",

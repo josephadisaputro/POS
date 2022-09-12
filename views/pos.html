@@ -554,6 +554,14 @@
             background-color: whitesmoke;
             color: green;
         }
+
+        .menu iframe{
+            position: fixed;
+            top: 5%;
+            left: 50%;
+            margin-left: -25%;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -565,17 +573,17 @@
             <div class="panel-container-content">
             </div>
             <div class="panel-container-footer">
-                <div class="menu">
+                <div class="menu" onclick="redirectToCheckoutPage()">
                     order list
-                </div>
-                <div class="menu">
-                    paid list
                 </div>
                 <div class="menu">
                     notepad
                 </div>
-                <div class="menu">
+                <div class="menu" onclick="unhideCalculator('Iframe')">
                     calculator
+                    <iframe src="./calculator" id="Iframe">
+
+                    </iframe>
                 </div>
                 <div class="menu setting-toolbar-selection general-account">
                     account
@@ -669,6 +677,34 @@
     </div>
 
     <script>
+        // Selecting the iframe element
+        var frame = document.getElementById("Iframe");
+          
+        // Adjusting the iframe height onload event
+        frame.onload = function()
+        // function execute while load the iframe
+        {
+            frame.style.height = 
+            frame.contentWindow.document.body.scrollHeight + 20 + 'px';
+            frame.style.width  = 
+            frame.contentWindow.document.body.scrollWidth + 20 +'px';
+        }
+
+        async function unhideCalculator(id){
+            if($("#"+id).css("display") == "block"){
+                $("#"+id).css("display", "none")
+            }else{
+                $("#"+id).css("display", "block")
+                var frame = document.getElementById(id);
+                frame.style.height = 
+                frame.contentWindow.document.body.scrollHeight + 20 + 'px';
+                frame.style.width  = 
+                frame.contentWindow.document.body.scrollWidth + 20 +'px';
+            }
+        }
+    </script>
+
+    <script>
         $( document ).ready(async function() {
             await loadCart()
             // $(".panel-container-content").css("height", $(".panel-container-content").width());
@@ -690,6 +726,10 @@
                 }
             }
         });
+
+        async function redirectToCheckoutPage(){
+            window.location.href = "./checkout";
+        }
 
         async function loadCart(){
             $(".checkout-table-content").empty()
