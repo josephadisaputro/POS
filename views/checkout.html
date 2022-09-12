@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Checkout</title>
+    <script src="https://code.jquery.com/jquery-3.6.1.js" integrity="sha256-3zlB5s2uwoUzrXK3BT7AX3FyvojsraNFxCc2vC/7pNI=" crossorigin="anonymous"></script>
+    <title>Checkout Page</title>
     <style>
         /* width */
         ::-webkit-scrollbar {
@@ -79,6 +80,7 @@
             border-radius: 10px;
             border: none;
             color: whitesmoke;
+            text-align: center;
         }
 
         .row{
@@ -133,7 +135,7 @@
     <div class="mainPanel">
         <div class="topPanel">
             <div class="taskbar">
-                <div class="column">
+                <div class="column backToPOS" onclick="getbacktoPOS()">
                     back to POS
                 </div>
                 <div class="column">
@@ -143,310 +145,8 @@
                     download the table below
                 </div>
             </div>
-            <div class="table">
-                <div class="row rowHead">
-                    <div class="column">
-                        as
-                        <span class="generalButton">
-                            click
-                        </span>
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                    <div class="column">
-                        asdasdasdasdasdasdasasdasdasdasda
-                    </div>
-                </div>
+            <div class="table checkoutData">
+                
             </div>
         </div>
         <div class="bottomPanel">
@@ -458,6 +158,137 @@
             </div>
         </div>
     </div>
+
+    <script>
+        async function ajaxSettings(path, method, data){
+            var settings = {
+                "url": `http://localhost:3000/${path}`,
+                "method": method,
+                "timeout": 0,
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                "data": JSON.stringify(data),
+            };
+            return settings;
+        }
+
+        async function ajaxCall(settings){
+            return await new Promise(async (resolve, reject) => {
+                await $.ajax(settings).done(async function (response) {
+                    resolve(response);
+                });          
+            })
+        }
+
+        $( document ).ready(async function() {
+            await loadCheckouts();
+        });
+
+        async function getbacktoPOS(){
+            window.location.href = "./pos";
+        }
+
+        async function loadCheckouts(){
+            $(".checkoutData").empty()
+            let data = {
+                "userEmail": localStorage.getItem('email'),
+                "uuid": localStorage.getItem('uuid'),
+                "salesOrderId": null
+            }
+            let response = await ajaxCall(await ajaxSettings(`checkout/get`, 'POST', data))
+            $(".checkoutData").append(
+            `
+                <div class="row rowHead">
+                    <!-- <div class="column">
+                        as
+                        <span class="generalButton">
+                            click
+                        </span>
+                    </div> -->
+                    <div class="column">
+                        Sales Order ID
+                    </div>
+                    <div class="column">
+                        Sub-total Amount
+                    </div>
+                    <div class="column">
+                        Total Amount
+                    </div>
+                    <div class="column">
+                        Tax %
+                    </div>
+                    <div class="column">
+                        Total Item Quantity
+                    </div>
+                    <div class="column">
+                        Payment Method
+                    </div>
+                    <div class="column">
+                        Payment Status 
+                    </div>
+                    <div class="column">
+                        Customer Email
+                    </div>
+                    <div class="column">
+                        Customer Name
+                    </div>
+                    <div class="column">
+                        Timestamp
+                    </div>
+                </div>
+            `);
+            if(response.status){
+                for(const eachCheckoutData of response.salesOrder){
+                    if(eachCheckoutData.paidStatus === "false"){
+                       alert("You still have unpaid orders, please make sure all orders have been paid") 
+                    }
+                    $(".checkoutData").append(
+                        `
+                        <div class="row rowHead">
+                            <div class="column">
+                                ${eachCheckoutData.salesOrderId}
+                            </div>
+                            <div class="column">
+                                ${eachCheckoutData.subTotalAmount}
+                            </div>
+                            <div class="column">
+                                ${eachCheckoutData.totalAmount}
+                            </div>
+                            <div class="column">
+                                ${eachCheckoutData.taxPercentage}
+                            </div>
+                            <div class="column">
+                                ${eachCheckoutData.totalQuantity}
+                            </div>
+                            <div class="column">
+                                ${eachCheckoutData.paymentMethod}
+                                ${eachCheckoutData.paidStatus === "true"? `<span></span>`: `<span class="generalButton">
+                                    edit
+                                </span>`}
+                            </div>
+                            <div class="column" ${eachCheckoutData.paidStatus === "true"? ``: `style="background-color:red"`}>
+                                ${eachCheckoutData.paidStatus}
+                                ${eachCheckoutData.paidStatus === "true"? `<span></span>`: `<span class="generalButton">
+                                    edit
+                                </span>`}
+                            </div>
+                            <div class="column">
+                                ${eachCheckoutData.customerEmailAddress}
+                            </div>
+                            <div class="column">
+                                ${eachCheckoutData.customerName}
+                            </div>
+                            <div class="column">
+                                ${eachCheckoutData.timeStamp.split("T")[0]} ${eachCheckoutData.timeStamp.split("T")[1].split("Z")[0]}
+                            </div>
+                        </div>
+                        `
+                    )
+                }
+            }
+        }
+    </script>
 
 </body>
 </html>

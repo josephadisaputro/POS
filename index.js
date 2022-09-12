@@ -19,6 +19,10 @@ app.get('/pos', function (req, res, next) {
     res.sendFile(viewDir + 'pos.html');
 })
 
+app.get('/checkout', function (req, res, next) {
+    res.sendFile(viewDir + 'checkout.html');
+})
+
 let signUpDTO = [
     "businessName",
     "businessAddress",
@@ -923,11 +927,17 @@ let editCheckoutDTO = [
     "userEmail",
     "uuid",
     "totalAmount",
-    "subTotal",
+    "subTotalAmount",
+    "taxPercentage",
     "items",
     "totalQuantity",
     "paymentMethod",
-    "isSalesOrderPending"
+    "paymentNote",
+    "paymentStatus",
+    "isSalesOrderPending",
+    "customerEmailAddress",
+    "customerName",
+    "customerPhonenumber"
 ]
 
 let getCheckoutDTO = [
@@ -953,9 +963,10 @@ app.post('/checkout/add', async function (req, res, next) {
                 var db = NoSQL.load('./db/salesOrders.nosql');
                 req.body.salesOrderId = await generateUID()
                 req.body.timeStamp = new Date()
-                req.body.paidStatus = false
+                req.body.paidStatus = req.body.paymentStatus
                 req.body.businessId = checkExistingBusiness.businessId
                 db.insert(req.body)
+                await removeCart(req.body)
                 res.json({
                     salesOrder: req.body,
                     status: true
@@ -986,14 +997,14 @@ app.post('/checkout/get', async function (req, res, next) {
             if(checkExistingBusiness){
                 const getSalesOrders = await getDb('salesOrders')
                 if(req.body.salesOrderId){
-                    const checkSalesOrderId = getSalesOrders.filter(a=> a.salesOrderId === req.body.salesOrderId && a.uuid === req.body.uuid && a.businessId === checkExistingBusiness.businessId)
+                    let checkSalesOrderId = getSalesOrders.filter(a=> a.salesOrderId === req.body.salesOrderId && a.uuid === req.body.uuid && a.businessId === checkExistingBusiness.businessId)
                     checkSalesOrderId = checkSalesOrderId.slice(req.body.page,req.body.page+req.body.limit)
                     res.json({
                         salesOrder: checkSalesOrderId,
                         status: true
                     });
                 }else{
-                    const checkSalesOrders = getSalesOrders.filter(a.uuid === req.body.uuid && a.businessId === checkExistingBusiness.businessId)
+                    let checkSalesOrders = getSalesOrders.filter(a=> a.uuid === req.body.uuid && a.businessId === checkExistingBusiness.businessId)
                     checkSalesOrders = checkSalesOrders.slice(req.body.page,req.body.page+req.body.limit)
                     res.json({
                         salesOrder: getSalesOrders,
@@ -1026,14 +1037,14 @@ app.post('/checkout/admin/get', async function (req, res, next) {
             if(checkExistingBusiness){
                 const getSalesOrders = await getDb('salesOrders')
                 if(req.body.salesOrderId){
-                    const checkSalesOrderId = getSalesOrders.filter(a=> a.salesOrderId === req.body.salesOrderId && a.businessId === checkExistingBusiness.businessId)
+                    let checkSalesOrderId = getSalesOrders.filter(a=> a.salesOrderId === req.body.salesOrderId && a.businessId === checkExistingBusiness.businessId)
                     checkSalesOrderId = checkSalesOrderId.slice(req.body.page,req.body.page+req.body.limit)
                     res.json({
                         salesOrder: checkSalesOrderId,
                         status: true
                     });
                 }else{
-                    const checkSalesOrders = getSalesOrders.filter(a.businessId === checkExistingBusiness.businessId)
+                    let checkSalesOrders = getSalesOrders.filter(a=> a.businessId === checkExistingBusiness.businessId)
                     checkSalesOrders = checkSalesOrders.slice(req.body.page,req.body.page+req.body.limit)
                     res.json({
                         salesOrder: getSalesOrders,

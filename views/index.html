@@ -4,11 +4,15 @@
     <script src="https://code.jquery.com/jquery-3.6.1.js" integrity="sha256-3zlB5s2uwoUzrXK3BT7AX3FyvojsraNFxCc2vC/7pNI=" crossorigin="anonymous"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@200&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300&family=Dosis:wght@200&display=swap" rel="stylesheet">
     <script src='https://kit.fontawesome.com/a076d05399.js' crossorigin='anonymous'></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <title>POS</title>
     <style>
+        body{
+            font-family: 'Comfortaa', cursive;
+        }
+
         :root {
             --borderRadius: 10px;
             --commonMargin: 1%;
@@ -20,7 +24,6 @@
             flex-direction: row;
             flex-wrap: nowrap;
             width: 100%;
-            font-family: 'Dosis', sans-serif;
             transition: var(--commonTransition);
         }
 
@@ -102,7 +105,8 @@
             width: 99%;
             margin: 0.25%;
             height: 96.5vh;
-            background-color: lightgrey;
+            background-color: whitesmoke;
+            border-right: solid 1px green;
             border-radius: var(--borderRadius);
             text-align: right;
             transition: var(--commonTransition);
@@ -118,6 +122,7 @@
             margin: 0.25%;
             height: 96.5vh;
             background-color: whitesmoke;
+            border-left: solid 1px darkturquoise;
             border-radius: var(--borderRadius);
             text-align: left;
             transition: var(--commonTransition);
@@ -213,6 +218,22 @@
             font-size: 40vh;
             color: red;
         }
+
+        .floatPanel{
+            width: 30%;
+            height: auto;
+            position: fixed;
+            bottom: 10%;
+            left: 50%;
+            margin-left: -17%;
+            text-align: center;
+            padding: var(--commonMargin);
+            background-color: darkorange;
+            color: whitesmoke;
+            border-radius: var(--borderRadius);
+            border: none;
+            font-size: 5vh;
+        }
     </style>
 </head>
 <body>
@@ -273,6 +294,10 @@
         <div class="failed-loading-area">
             <i class='fas fa-exclamation-circle'></i>
         </div>
+    </div>
+
+    <div class="floatPanel">
+        About us
     </div>
 
     <script>

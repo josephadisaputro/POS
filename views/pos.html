@@ -474,7 +474,7 @@
         }
 
         .panel-container-footer{
-            width: 100%;
+            width: 99.5%;
             height: 7.75%;
             font-size: 140%;
             margin: 0.25%;
@@ -495,6 +495,64 @@
             color: black;
             text-align: center;
             font-size: 100%;
+        }
+
+        /* checkout */
+        .table{
+            display: flex;
+            flex-direction: column;
+            flex-wrap: nowrap;
+            overflow-x: scroll;
+            margin: 0;
+            background-color: whitesmoke;
+            border-radius: 10px;
+            border: none;
+            font-size: large;
+        }
+
+        .rowHead .column{
+            background-color: darkolivegreen;
+            border-radius: 10px;
+            border: none;
+            color: whitesmoke;
+            text-align: center;
+        }
+
+        .row{
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            margin: 0;
+        }
+
+        .column{
+            margin: 1%;
+            border-radius: 10px;
+            border: none;
+            background-color: darkslategray;
+            color: whitesmoke;
+            width: 20%;
+            min-width: 20%;
+            max-width: 20%;
+            padding: 1%;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .generalButton{
+            width: fit-content;
+            background-color: green;
+            color: whitesmoke;
+            border-radius: 5px;
+            border: none;
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+            padding: var(--commonMargin);
+            margin: var(--commonMargin);
+        }
+        .usedAsNotButton{
+            background-color: whitesmoke;
+            color: green;
         }
     </style>
 </head>
@@ -930,7 +988,8 @@
                 console.log(response)
                 if(response.status){
                     $(".setting-toolbar-box").append(`
-                    <input class="input-general-pop-up-setting itemSKU" type="text" value="${response.categories.itemSKU}">
+                        <input class="input-general-pop-up-setting itemSKU" type="text" value="${response.categories.itemSKU}">
+                        </input>
                         <input class="input-general-pop-up-setting itemName" type="text" value="${response.categories.itemName}">
                         </input>
                         <input class="input-general-pop-up-setting itemName" type="text" value="${response.categories.itemPrice}">
@@ -1244,10 +1303,147 @@
         }
 
         // checkout
-        $( ".checkout" ).click(function() {
+        $( ".checkout" ).click(async function() {
             $(".setting-toolbar-box-background").css("display", `block`);
             $(".general-modal").css("display", `block`);
+            $(".general-modal").empty();
+            $(".general-modal").append(`
+                <div class="detailedItem">
+                    <div class="itemDetails">
+                        <div class="table checkoutData">
+                            <div class="row rowHead">
+                                <div class="column">
+                                    Item SKU
+                                </div>
+                                <div class="column">
+                                    Quantity
+                                </div>
+                                <div class="column">
+                                    Total Amount
+                                </div>
+                                <div class="column">
+                                    Order Note
+                                </div>
+                            </div>
+                        </div>
+                    </div>  
+                </div>
+            `)
+            let data = {
+                "userEmail": localStorage.getItem('email'),
+                "uuid": localStorage.getItem('uuid'),
+                "tax": 0
+            }
+            let getTaxInfo = await ajaxCall(await ajaxSettings(`tax/get`, 'POST', data))
+            data = {
+                "userEmail": localStorage.getItem('email'),
+                "uuid": localStorage.getItem('uuid'),
+            }
+            let response = await ajaxCall(await ajaxSettings(`cart/get`, 'POST', data))
+            if(response.status){
+                for(const eachItem of response.cart.items){
+                    data = {
+                        "userEmail": localStorage.getItem('email'),
+                        "uuid": localStorage.getItem('uuid'),
+                        "page": 0,
+                        "limit": 10,
+                        "itemSKU": eachItem.itemSKU
+                    }
+                    let getItemDetails = await ajaxCall(await ajaxSettings(`admin/item/get`, 'POST', data))
+                    console.log(response)
+                    if(getItemDetails.status){
+                        $(".checkoutData").append(`
+                            <div class="row">
+                                <div class="column">
+                                    ${eachItem.itemSKU}
+                                </div>
+                                <div class="column">
+                                    ${eachItem.itemQuantity}
+                                </div>
+                                <div class="column">
+                                    ${(getItemDetails.categories.itemPrice * 1) * (eachItem.itemQuantity * 1)}
+                                </div>
+                                <div class="column">
+                                    ${eachItem.itemNote}
+                                </div>
+                            </div>
+                        `);
+                    }
+                }
+                $(".detailedItem").append(
+                `
+                    <input class="input-general-pop-up-setting customerName" type="text" placeholder="customer name">
+                    </input>
+                    <input class="input-general-pop-up-setting customerEmail" type="text" placeholder="customer email">
+                    </input>
+                    <input class="input-general-pop-up-setting customerPhonenumber" type="text" placeholder="customer phonenumber">
+                    </input>
+                    <div class="generalButton usedAsNotButton">payment method: (select payment method below)<select class="categoryDDLGENERIC paymentMethod" name="paymentMethod" id="paymentMethod">
+                        <option value="cash">cash</option>
+                        <option value="qrcash">qr code cash</option>
+                        <option value="debit">debit</option>
+                        <option value="credit">credit</option>
+                    </select></div>
+                    <div class="generalButton usedAsNotButton">payment status: (select payment status below)<select class="categoryDDLGENERIC paymentStatus" name="paymentStatus" id="paymentSTatus">
+                        <option value=false>unpaid</option>
+                        <option value=true>paid</option>
+                    </select></div>
+                    <input class="input-general-pop-up-setting paymentNote" type="text" placeholder="paymet note">
+                    </input>
+                    <div class="generalButton usedAsNotButton">
+                        tax: <span class="recordedTaxPercentageForThisCheckout">${getTaxInfo.status?getTaxInfo.tax.tax? getTaxInfo.tax.tax: 0: 0}</span>%
+                    </div>
+                    <div class="generalButton usedAsNotButton">
+                        total amount: <span class="recordedTotalAmountForThisCheckout">${$(".total").html()*1}</span>
+                    </div>
+                    <div class="generalButton" onclick="addNewCheckoutData(${$(".total").html()*1}, ${getTaxInfo.status?getTaxInfo.tax.tax? getTaxInfo.tax.tax: 0: 0}, ${$(".subTotal").html()*1})">
+                        submit
+                    </div>
+                    <div class="generalButton">
+                        print
+                    </div>
+                `
+                );
+            }
         });
+
+
+        async function addNewCheckoutData(totalAmount, tax, subTotal){
+            let data = {
+                "userEmail": localStorage.getItem('email'),
+                "uuid": localStorage.getItem('uuid'),
+            }
+            let getCart = await ajaxCall(await ajaxSettings(`cart/get`, 'POST', data))
+            let totalQuantity = 0;
+            if(getCart.status){
+                for(const eachItem of getCart.cart.items){
+                    totalQuantity = totalQuantity + (eachItem.itemQuantity * 1)
+                }
+            }
+            data = {
+                "userEmail": localStorage.getItem('email'),
+                "uuid": localStorage.getItem('uuid'),
+                "totalAmount": totalAmount,
+                "subTotalAmount": subTotal,
+                "taxPercentage": tax,
+                "items": JSON.stringify(getCart.cart.items),
+                "totalQuantity": totalQuantity,
+                "paymentMethod": $('.paymentMethod').find(":selected").val(),
+                "paymentNote": $(".paymentNote").val(),
+                "paymentStatus": $('.paymentStatus').find(":selected").val(),
+                "isSalesOrderPending": false,
+                "customerEmailAddress": $(".customerEmail").val(),
+                "customerName": $(".customerName").val(),
+                "customerPhonenumber": $(".customerPhonenumber").val()
+            }
+            let addNewCheckout = await ajaxCall(await ajaxSettings(`checkout/add`, 'POST', data))
+            console.log(addNewCheckout)
+            if(addNewCheckout.status){
+                window.location.href = "./checkout";
+            }else{
+                  
+            }
+        }
 
 
         async function addItemToCart(itemSKU){
