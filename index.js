@@ -30,6 +30,10 @@ app.get('/calculator', function (req, res, next) {
     res.sendFile(viewDir + 'calculator.html');
 })
 
+app.get('/aboutMe', function (req, res, next) {
+    res.sendFile(viewDir + 'aboutMe.html');
+})
+
 let signUpDTO = [
     "businessName",
     "businessAddress",

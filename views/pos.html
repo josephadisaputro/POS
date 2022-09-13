@@ -938,6 +938,8 @@
                 }
                 let response = await ajaxCall(await ajaxSettings(`logout`, 'POST', data))
                 if(response.status){
+                    localStorage.setItem('email', "")
+                    localStorage.setItem('uuid', "")
                     window.location.href = "./";
                 }
             } else if(selected.includes('tax')){

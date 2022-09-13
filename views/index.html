@@ -296,7 +296,7 @@
         </div>
     </div>
 
-    <div class="floatPanel">
+    <div class="floatPanel aboutMe" onclick="gotToIntroductionPage()">
         About us
     </div>
 
@@ -371,6 +371,10 @@
                 }
             });
         });
+
+        async function gotToIntroductionPage(){
+            window.location.href = "./aboutMe";
+        }
 
         async function ajaxSettings(path, method, data){
             var settings = {
