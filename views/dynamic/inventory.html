@@ -1,0 +1,77 @@
+<div class="card header-menu">
+    <div onclick="renderCreateItem()" class="card header-menu-element">Create New Item</div>
+</div>
+<div class="card body-menu">
+    <div class="table">
+        <div class="card header-table">
+            <div class="text">Action Buttons</div>
+            <div class="text">Item Name</div>
+            <div class="text">Item SKU</div>
+            <div class="text">Quantity</div>
+            <div class="text">Sell Price</div>
+        </div>
+        <div class="card body-table">
+            
+        </div>
+    </div>
+</div>
+<script>
+    getItemListAPI()
+    
+    async function getItemListAPI(page, size){
+        let settings = {
+            "url": `${(new URL(window.location)).origin}/api/v1/item/view/list`,
+            "method": "POST",
+            "timeout": 0,
+            "headers": {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${(new URLSearchParams(window.location.search).get("pageToken"))}`
+            },
+            "data": JSON.stringify({
+                "editorEmail": `${(new URLSearchParams(window.location.search).get("email"))}`,
+                "companyUUID": `${(new URLSearchParams(window.location.search).get("uuid"))}`,
+                "page": `${page}`,
+                "size": `${size}`
+            }),
+        };
+
+        await $.ajax(settings).done(async function (response) {
+            console.log(response)
+            if(!response.items){
+                $(`body`).append(`
+                    <div class="card main-background" onclick="clearPopUp()">
+                    </div>
+                    <div class="card pop-up">
+                        <div class="card title">
+                            Warning Notification
+                        </div>
+                        <div class="card content-text">
+                            ${response.error}
+                        </div>
+                    </div>
+                `)
+            }else{
+                for(const eachItem of response.items){
+                    $(`.card.body-table`).empty()
+                    $(`.card.body-table`).append(`
+                        <div class="card body-row-table">
+                            <div class="text action-buttons-group">
+                                <div class="action-button">
+                                    Edit
+                                </div>
+                                <div class="action-button">
+                                    View Details
+                                </div>
+                            </div>
+                            <div class="text">${eachItem.itemName}</div>
+                            <div class="text">${eachItem.itemSKU}</div>
+                            <div class="text">${eachItem.itemQty}</div>
+                            <div class="text">${eachItem.itemSellPrice}</div>
+                        </div>
+                    `)
+                }
+            }
+        });
+    }
+
+</script>

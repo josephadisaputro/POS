@@ -16,10 +16,28 @@ app.get('/', async function (req, res, next) {
     res.sendFile(__dirname + "/views/sign-up-desktop.html")
 })
 
+app.get('/sub-page/:menu', async function (req, res, next) {
+    if(req.query.pageToken){
+        try{
+            await userObject.verifyToken(req.query.pageToken)
+            if(req.params.menu){
+                res.sendFile(__dirname + "/views/dynamic/" + req.params.menu + ".html")
+                return
+            }else{
+                res.sendFile("")
+                return
+            }
+        }catch(e){
+            console.log(e)
+            res.sendFile("")
+            return
+        }
+    }
+    res.sendFile("")
+    return
+})
+
 app.get('/page/:path', async function (req, res, next) {
-    console.log("================================")
-    console.log(req.query.pageToken)
-    console.log(req.params.path)
     if(req.query.pageToken){
         try{
             await userObject.verifyToken(req.query.pageToken)

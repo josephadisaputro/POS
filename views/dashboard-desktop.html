@@ -741,7 +741,27 @@
         function renderMenu(menu){
             $(`.card.menu-element`).removeClass(`active`)
             $(this).toggleClass(`active`)
-            renderSalesOrderMenuNonCashierMode()
+            renderMenuAPI(menu)
+        }
+
+        async function renderMenuAPI(menu){
+            let settings = {
+                "url": `${(new URL(window.location)).origin}/sub-page/${menu}?pageToken=${(new URLSearchParams(window.location.search)).get("pageToken")}&email=${(new URLSearchParams(window.location.search)).get("email")}&uuid=${uuid}`,
+                "method": "GET",
+                "timeout": 0,
+                "headers": {
+                    "Content-Type": "application/json"
+                }
+            };
+
+            await $.ajax(settings).done(async function (response) {
+                if(response){
+                    $(`.card.active-menu`).empty()
+                    $(`.card.active-menu`).append(`
+                        ${response}
+                    `)
+                }
+            });
         }
 
         async function getMenuAPICall(){
