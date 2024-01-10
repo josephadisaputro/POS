@@ -219,7 +219,62 @@ class tempDatabase {
     }
     
     
-    async read(filename, page = -1, size = -1, searchKey = null, searchValue = null) {
+    // async read(filename, page = -1, size = -1, searchKey = null, searchValue = null) {
+    //     while (this.lock) {
+    //         await new Promise(resolve => setTimeout(resolve, 100));
+    //     }
+    
+    //     this.lock = true;
+    
+    //     try {
+    //         const files = await readdir(__dirname + '/db');
+    //         const filenameFiles = files.filter(file => file.startsWith(filename) && file.endsWith('.xlsx'));
+    //         filenameFiles.sort();
+    
+    //         if (filenameFiles.length === 0) {
+    //             return [];
+    //         }
+    
+    //         if (searchKey !== null && searchValue !== null) {
+    //             return await this.linearSearch(filenameFiles, searchKey, searchValue);
+    //         }
+    
+    //         if (page !== -1 && size !== -1) {
+    //             if (!Number.isInteger(page) || !Number.isInteger(size) || page < 1 || size < 1) {
+    //                 throw new Error("Page and size must be integers and 1 or greater, or -1 to return all");
+    //             }
+    
+    //             const startFileIndex = (page - 1) * size;
+    //             const endFileIndex = startFileIndex + size;
+    //             let data = [];
+    
+    //             for (let i = startFileIndex; i < endFileIndex; i++) {
+    //                 if (i < filenameFiles.length) {
+    //                     const workbook = xlsx.readFile(path.join(__dirname, '/db', filenameFiles[i]));
+    //                     const jsonData = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+    //                     data = data.concat(jsonData);
+    //                 }
+    //             }
+    //             return data;
+    //         }
+    
+    //         // If no page, size, searchKey, and searchValue are provided, return all data
+    //         let allData = [];
+    //         for (let file of filenameFiles) {
+    //             const workbook = xlsx.readFile(path.join(__dirname, '/db', file));
+    //             const jsonData = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+    //             allData = allData.concat(jsonData);
+    //         }
+    //         return allData;
+    //     } catch (error) {
+    //         console.error(error);
+    //         throw error;
+    //     } finally {
+    //         this.lock = false;
+    //     }
+    // }
+
+    async read(filename, page = -1, size = -1, searchKey = null, searchValue = null, sort = null) {
         while (this.lock) {
             await new Promise(resolve => setTimeout(resolve, 100));
         }
@@ -239,6 +294,7 @@ class tempDatabase {
                 return await this.linearSearch(filenameFiles, searchKey, searchValue);
             }
     
+            let data = [];
             if (page !== -1 && size !== -1) {
                 if (!Number.isInteger(page) || !Number.isInteger(size) || page < 1 || size < 1) {
                     throw new Error("Page and size must be integers and 1 or greater, or -1 to return all");
@@ -246,7 +302,6 @@ class tempDatabase {
     
                 const startFileIndex = (page - 1) * size;
                 const endFileIndex = startFileIndex + size;
-                let data = [];
     
                 for (let i = startFileIndex; i < endFileIndex; i++) {
                     if (i < filenameFiles.length) {
@@ -255,17 +310,27 @@ class tempDatabase {
                         data = data.concat(jsonData);
                     }
                 }
-                return data;
+            } else {
+                // If no page, size, searchKey, and searchValue are provided, return all data
+                for (let file of filenameFiles) {
+                    const workbook = xlsx.readFile(path.join(__dirname, '/db', file));
+                    const jsonData = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                    data = data.concat(jsonData);
+                }
             }
     
-            // If no page, size, searchKey, and searchValue are provided, return all data
-            let allData = [];
-            for (let file of filenameFiles) {
-                const workbook = xlsx.readFile(path.join(__dirname, '/db', file));
-                const jsonData = xlsx.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-                allData = allData.concat(jsonData);
+            // If sort parameter is provided, sort the data
+            if (sort !== null) {
+                data.sort((a, b) => {
+                    if (sort === 'asc') {
+                        return a - b;
+                    } else if (sort === 'desc') {
+                        return b - a;
+                    }
+                });
             }
-            return allData;
+    
+            return data;
         } catch (error) {
             console.error(error);
             throw error;
@@ -273,6 +338,7 @@ class tempDatabase {
             this.lock = false;
         }
     }
+    
 }
 
 module.exports = tempDatabase;

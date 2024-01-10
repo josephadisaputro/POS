@@ -1,5 +1,5 @@
 <div class="card header-menu">
-    <div onclick="renderCreateItem()" class="card header-menu-element">Create New Item</div>
+    <div class="title">Inventory</div>
 </div>
 <div class="card body-menu">
     <div class="table">
@@ -21,6 +21,7 @@
     </div>
 </div>
 <script>
+    let menu = 'inventory'
     let page = 1;
     let size = 10;
     getItemListAPI()
@@ -61,17 +62,20 @@
                     </div>
                 `)
             }else{
+                const accessAllowed = await getMenuActionAccessAPICall()
+                accessAllowed['Create']? $(`.card.header-menu`).append(`<div onclick="renderCreateItem()" class="card header-menu-element">Create New Item</div>`) : 
+                
                 $(`.card.body-table`).empty()
                 for(const eachItem of response.items){
                     $(`.card.body-table`).append(`
                         <div class="card body-row-table">
                             <div class="text action-buttons-group">
-                                <div class="action-button" onclick="editItem('${eachItem.itemSKU}', '${eachItem.companyUUID}')">
+                                ${accessAllowed['Edit']? `<div class="action-button" onclick="editItem('${eachItem.itemSKU}', '${eachItem.companyUUID}')">
                                     Edit
-                                </div>
-                                <div class="action-button" onclick="viewItemDetails('${eachItem.itemSKU}', '${eachItem.companyUUID}')">
+                                </div>` : "" }
+                                ${accessAllowed['View']? `<div class="action-button" onclick="viewItemDetails('${eachItem.itemSKU}', '${eachItem.companyUUID}')">
                                     View Details
-                                </div>
+                                </div>` : "" }
                             </div>
                             <div class="text">${eachItem.itemName}</div>
                             <div class="text">${eachItem.itemSKU}</div>
@@ -82,10 +86,51 @@
                 }
             }
         });
+    }
 
-        function editItem(itemSKU, companyUUID){
+    function editItem(itemSKU, companyUUID){
 
-        }
+    }
+
+    async function getMenuActionAccessAPICall(){
+        let settings = {
+            "url": `${(new URL(window.location)).origin}/api/v1/menu/view/list/access`,
+            "method": "POST",
+            "timeout": 0,
+            "headers": {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${(new URLSearchParams(window.location.search).get("pageToken"))}`
+            },
+            "data": JSON.stringify({
+                "email": `${(new URLSearchParams(window.location.search).get("email"))}`,
+                "uuid": `${(new URLSearchParams(window.location.search).get("uuid"))}`,
+                "menu": `${menu}`
+            }),
+        };
+
+        return new Promise(async (resolve, reject) => {
+
+            await $.ajax(settings).done(async function (response) {
+                console.log(response.access[0])
+                if(!response.access){
+                    $(`body`).append(`
+                        <div class="card main-background" onclick="clearPopUp()">
+                        </div>
+                        <div class="card pop-up">
+                            <div class="card title">
+                                Warning Notification
+                            </div>
+                            <div class="card content-text">
+                                ${response.error}
+                            </div>
+                        </div>
+                    `)
+                    resolve()
+                }else{
+                    resolve(response.access[0])
+                }
+            });
+        });
     }
 
 </script>

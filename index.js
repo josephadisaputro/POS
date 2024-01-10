@@ -237,6 +237,28 @@ app.post('/api/v1/menu/view/list', async function (req, res, next) {
     }
 })
 
+app.post('/api/v1/menu/view/list/access', async function (req, res, next) {
+    try{
+        const authHeader = req.headers['authorization'];
+        const token = authHeader && authHeader.split(' ')[1];
+
+        if (token == null){
+            res.sendStatus(401)
+            return
+        }
+
+        if(typeof req.body === 'object' && req.body !== null){
+            res.json({
+                access: await userObject.viewAllowAccessToMenu(req.body, token)
+            })
+        }
+    }catch(e){
+        res.json({
+            error: e
+        })
+    }
+})
+
 app.post('/api/v1/item/create', async (req, res) => {
     try {
         const token = req.headers.authorization.split(' ')[1];

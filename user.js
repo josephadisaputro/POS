@@ -43,6 +43,36 @@ class User{
         }
     }
 
+    async viewAllowAccessToMenu(payload, token){
+        try{
+            await this.verifyToken(token)
+            if(payload.email && payload.uuid){
+                const findCompanyUUID = await this.tempDatabaseObject.read(this.companyFilename, -1, -1, "uuid", payload.uuid)
+                if(findCompanyUUID.length > 0){
+                    if(findCompanyUUID[0].isDeleted){
+                        if(findCompanyUUID[0].isDeleted == true){
+                            throw `Company was deleted`
+                        }
+                    }
+                    const employees = JSON.parse(findCompanyUUID[0].employees);
+                    findCompanyUUID[0].employees = employees;
+                    const findEmployee = employees.findIndex(obj => obj.email == payload.email)
+                    if(findEmployee == -1){
+                        throw `Not employee`
+                    }else{
+                        return await this.uamObject.getAvailableActionsForTheMenu(employees[findEmployee].uam, payload.menu)
+                    }
+                }else{
+                    throw `Company not found`
+                }
+            }else{ 
+                throw `Payload provided is not complete`
+            }
+        }catch(e){
+            throw e
+        }
+    }
+
     async editCompany(payload, token){
         try{
             await this.verifyToken(token)

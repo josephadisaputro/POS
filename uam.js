@@ -58,6 +58,37 @@ class UAM {
             throw e
         }
     }
+
+    async getAvailableActionsForTheMenu(role, menu){
+        try{
+            const matrix = await this.readMatrix()
+            let findAccess = matrix.filter(obj => obj.Role == role && obj.AccessDashboard == true && obj['Menu'] == menu)
+            if(findAccess.length > 0){
+                const actions = findAccess.map(obj => ({
+                    Create: obj['Create'],
+                    View: obj['View'],
+                    Edit: obj['Edit'],
+                    Delete: obj['Delete']
+                }));
+                return actions
+            }else{
+                findAccess = matrix.filter(obj => obj.Role == role && obj.AccessDashboard == false && obj['Menu'] == menu)
+                if(findAccess.length > 0){
+                    const actions = findAccess.map(obj => ({
+                        Create: obj['Create'],
+                        View: obj['View'],
+                        Edit: obj['Edit'],
+                        Delete: obj['Delete']
+                    }));
+                    return actions
+                }else{
+                    throw `Menu is not found`
+                }
+            }
+        }catch(e){
+            throw e
+        }
+    }
 }
 
 module.exports = UAM;
