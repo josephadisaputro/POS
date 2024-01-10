@@ -1,0 +1,79 @@
+<div class="card header-menu">
+    <div onclick="renderCreateSalesOrderNonCashierMode()" class="card header-menu-element">Create New Sales Order</div>
+    <div onclick="renderCashierMode()" class="card header-menu-element">Change View to Cashier Mode</div>
+</div>
+<div class="card body-menu">
+    <div class="table">
+        <div class="card header-table">
+            <div class="text">Action Buttons</div>
+            <div class="text">Header 2</div>
+            <div class="text">Header 3</div>
+            <div class="text">Created At</div>
+            <div class="text">Status</div>
+        </div>
+        <div class="card body-table">
+            <div class="card body-row-table">
+                <div class="text action-buttons-group">
+                    <div class="action-button">
+                        Edit
+                    </div>
+                    <div class="action-button">
+                        View
+                    </div>
+                    <div class="action-button">
+                        Delete
+                    </div>
+                </div>
+                <div class="text">A very long header on top very very long header, unimaginable</div>
+                <div class="text">Body Row 3</div>
+                <div class="text">Created at</div>
+                <div class="text">Status</div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    async function getMenuAPICall(){
+            let settings = {
+                "url": `${(new URL(window.location)).origin}/api/v1/menu/view/list`,
+                "method": "POST",
+                "timeout": 0,
+                "headers": {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${(new URLSearchParams(window.location.search).get("pageToken"))}`
+                },
+                "data": JSON.stringify({
+                    "email": `${(new URLSearchParams(window.location.search).get("email"))}`,
+                    "uuid": `${(new URLSearchParams(window.location.search).get("uuid"))}`
+                }),
+            };
+
+            await $.ajax(settings).done(async function (response) {
+                console.log(response)
+                if(!response.menus){
+                    $(`body`).append(`
+                        <div class="card main-background" onclick="clearPopUp()">
+                        </div>
+                        <div class="card pop-up">
+                            <div class="card title">
+                                Warning Notification
+                            </div>
+                            <div class="card content-text">
+                                ${response.error}
+                            </div>
+                        </div>
+                    `)
+                }else{
+                    for(const eachMenu of response.menus){
+                        $(`.card.menu-bar`).empty()
+                        $(`.card.menu-bar`).append(`
+                            <div id="company-profile-menu" class="card menu-element" onclick="renderMenu('${eachMenu.menu}')">
+                                <div class="menu-title">${eachMenu.menuName}</div>
+                            </div>
+                        `)
+                    }
+                }
+            });
+        }
+
+</script>

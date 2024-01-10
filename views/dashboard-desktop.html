@@ -741,7 +741,7 @@
         function renderMenu(menu){
             $(`.card.menu-element`).removeClass(`active`)
             $(this).toggleClass(`active`)
-            $(`.card.active-menu`).empty()
+            renderSalesOrderMenuNonCashierMode()
         }
 
         async function getMenuAPICall(){
