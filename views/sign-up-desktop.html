@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sign-up</title>
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+</head>
+<style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        font-family: 'Roboto', sans-serif;
+    }
+    .card{
+        padding: 1vh;
+        border-radius: 10px;
+        border: none;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        background-color: white;
+        color: #007AFF;
+        box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.19), 0px 6px 6px rgba(0, 0, 0, 0.23);
+    }
+    .title{
+        font-size: 10vh;
+    }
+    .button{
+        width: fit-content;
+        font-size: 2vh;
+        background-color: white;
+        color: #007AFF;
+        padding-left: 2vh;
+        padding-right: 2vh;
+        padding-top: 1vh;
+        padding-bottom: 1vh;
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.19), 0px 6px 6px rgba(0, 0, 0, 0.23);
+    }
+    .button.enter{
+        background-color: #007AFF;
+        color: white;
+    }
+    .button.sign-in-instead{
+        position: absolute;
+        right: 1vh;
+        bottom: 1vh;
+    }
+    .button.sign-in-instead.hide{
+        display: none;
+    }
+    .button.sign-up-instead{
+        position: absolute;
+        left: 1vh;
+        bottom: 1vh;
+    }
+    .button.sign-up-instead.hide{
+        display: none;
+    }
+    .title.sign-up-title{
+        position: absolute;
+        right: 1vh;
+        top: calc(50% - (10vh/2));
+        text-align: left;
+        color: white;
+    }
+    .title.sign-in-title{
+        position: absolute;
+        left: 1vh;
+        top: calc(50% - (10vh/2));
+        text-align: left;
+        color: white;
+    }
+    .title.sign-in-title.hide{
+        display: none;
+    }
+    .title.sign-up-title.hide{
+        display: none;
+    }
+    .card.sign-up{
+        width: 50vw;
+        height: 70vh;
+        position: fixed;
+        top: calc(50% - (70vh / 2));
+        left: calc(50% - (50vw / 2));
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        padding: 0;
+    }
+    .card.visor{
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: calc(50% - 2vh);
+        height: calc(100% - 2vh);
+        background-color: #007AFF;
+        z-index: 1;
+        transition: 1s;
+    }
+    .card.visor.sign-in-shown{
+        position: absolute;
+        left: 50%;
+        top: 0;
+        width: calc(50% - 2vh);
+        height: calc(100% - 2vh);
+        background-color: #007AFF;
+        z-index: 1;
+        transition: 1s;
+    }
+    .card.sign-up-form{
+        width: calc(50% - 2vh);
+        box-shadow: none;
+        z-index: 0;
+    }
+    .card.sign-up-form .grouped-input{
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        margin: 1vh;
+    }
+    .card.sign-up-form .grouped-input label{
+        color: #007AFF;
+        font-size: 2vh;
+    }
+    .card.sign-up-form .grouped-input input{
+        border: 1px solid #007AFF;
+        background-color: white;
+        border-radius: 10px;
+        height: 5vh;
+        width: 100%;
+        font-size: 3vh;
+        text-align: center;
+    }
+    .card.sign-up-form .grouped-input input:focus{
+        border: none;
+        outline: none;
+        box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.19), 0px 6px 6px rgba(0, 0, 0, 0.23);
+    }
+    .card.sign-up-form .grouped-input .grouped-input-row{
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+    }
+</style>
+<style>
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 7vh;
+        height: calc(5vh + 2px);
+    }
+
+    .switch-input {
+        display:none;
+    }
+
+    .switch-label {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+        background-color: darkgray;
+        border-radius: 10px;
+        transition: background-color 0.3s;
+        margin-left: 1vh;
+    }
+
+    .switch-switch {
+        position: absolute;
+        top: 4px;
+        left: 4px;
+        width: 1vh;
+        height: calc(5vh - 6px);
+        border-radius: 26px;
+        background-color: white;
+        transition: left 0.3s;
+    }
+
+    .switch-input:checked + .switch-label {
+        background-color: #007AFF;
+    }
+
+    .switch-input:checked + .switch-label .switch-switch {
+        left: calc(7vh - 2vh - 4px);
+    }
+</style>
+<style>
+    .card.main-background{
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        gap: 1vh;
+        border-radius: 0%;
+        z-index: 5;
+    }
+    .card.pop-up{
+        width: 50%;
+        position: fixed;
+        left: calc(25%);
+        top: calc(12.5%);
+        background-color: #007AFF;
+        color: white;
+        z-index: 6;
+    }
+    .card.title{
+        background-color: #007AFF;
+        color: white;
+        font-size: 3vh;
+    }
+    .card.content-text{
+        margin-top: 1vh;
+        font-size: 2.5vh;
+    }
+</style>
+<body>
+    <div class="card sign-up">
+        <div class="card visor">
+            <div class="title sign-in-title hide">Sign-in</div>
+            <button class="button sign-up-instead hide" onclick="toggleVisorCard()">Sign-up instead?</button>
+            <div class="title sign-up-title">Sign-up</div>
+            <button class="button sign-in-instead" onclick="toggleVisorCard()">Sign-in instead?</button>
+        </div>
+        <div class="card sign-up-form">
+            <div class="grouped-input">
+                <label>Email</label>
+                <input id="sign-in-email" type="email" placeholder="email@email.com" />
+            </div>
+            <div class="grouped-input">
+                <label>Password</label>
+                <div class="grouped-input-row">
+                    <input id="sign-in-password" class="password" type="password" placeholder="password" />
+                    <div class="switch">
+                        <input type="checkbox" id="toggle-password-visibility-sign-in" class="switch-input">
+                        <label for="toggle-password-visibility-sign-in" class="switch-label">
+                          <span class="switch-switch"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="grouped-input">
+                <button id="sign-in-now-button" class="button enter" onclick="signinRequest()">Sign-in</button>
+            </div>
+        </div>
+        <div class="card sign-up-form">
+            <div class="grouped-input">
+                <label>Email</label>
+                <input id="sign-up-email" type="email" placeholder="email@email.com" />
+            </div>
+            <div class="grouped-input">
+                <label>Password</label>
+                <div class="grouped-input-row">
+                    <input id="sign-up-password" class="password" type="password" placeholder="password" />
+                    <div class="switch">
+                        <input type="checkbox" id="toggle-password-visibility-sign-up" class="switch-input">
+                        <label for="toggle-password-visibility-sign-up" class="switch-label">
+                          <span class="switch-switch"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="grouped-input">
+                <label>Phone Number</label>
+                <input id="sign-up-phone-number" type="tel" placeholder="08XX XXXX XXXX" />
+            </div>
+            <div class="grouped-input">
+                <label>Addess</label>
+                <input id="sign-up-address" type="text" placeholder="addresss" />
+            </div>
+            <div class="grouped-input">
+                <label>Postcode</label>
+                <input id="sign-up-postcode" type="number" placeholder="15XXX">
+            </div>
+            <div class="grouped-input">
+                <button id="sign-up-now-button" class="button enter" onclick="signupRequest()">Sign-up</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            $(`#toggle-password-visibility-sign-up`).click(function() {
+                var passwordInput = $('#sign-up-password');
+                if (passwordInput.attr('type') === 'password') {
+                    passwordInput.attr('type', 'text');
+                } else {
+                    passwordInput.attr('type', 'password');
+                }
+            });
+            $(`#toggle-password-visibility-sign-in`).click(function() {
+                var passwordInput = $('#sign-in-password');
+                if (passwordInput.attr('type') === 'password') {
+                    passwordInput.attr('type', 'text');
+                } else {
+                    passwordInput.attr('type', 'password');
+                }
+            });
+        });
+
+        function signinRequest(){
+            let email = $(`#sign-in-email`).val()
+            let password = $(`#sign-in-password`).val()
+            signInApiCall(email, password);
+        }
+
+        async function signInApiCall(email, password){
+            let settings = {
+                "url": "./api/v1/sign-in",
+                "method": "POST",
+                "timeout": 0,
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                "data": JSON.stringify({
+                    "email": `${email}`,
+                    "password": `${password}`
+                }),
+            };
+
+            await $.ajax(settings).done(async function (response) {
+                console.log(response);
+                if(response.error){
+                    renderPopUpAlert(response.error)
+                }else{
+                    if(response.token){
+                        // console.log(`./page/subdashboard-desktop?pageToken=${response.token}&email=${email}`)
+                        window.location.replace(`./page/subdashboard-desktop?pageToken=${response.token}&email=${email}`);
+                    }else{
+                        renderPopUpAlert()
+                    }
+                }
+            });
+        }
+
+        function signupRequest(){
+            let email = $(`#sign-up-email`).val()
+            let password = $(`#sign-up-password`).val()
+            let phoneNumber = $(`#sign-up-phone-number`).val()
+            let address = $(`#sign-up-address`).val()
+            let postcode = $(`#sign-up-postcode`).val()
+            signUpApiCall(email, password, phoneNumber, address, postcode);
+        }
+
+        async function signUpApiCall(email, password, phoneNumber, address, postcode){
+            let settings = {
+                "url": "./api/v1/sign-up",
+                "method": "POST",
+                "timeout": 0,
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                "data": JSON.stringify({
+                    "email": `${email}`,
+                    "password": `${password}`,
+                    "phoneNumber": `${phoneNumber}`,
+                    "address": `${address}`,
+                    "postcode": `${postcode}`
+                }),
+            };
+
+            await $.ajax(settings).done(async function (response) {
+                console.log(response);
+                if(response.error){
+                    renderPopUpAlert(response.error)
+                }else{
+                    if(response.token){
+                        window.location.replace(`./page/subdashboard-desktop?pageToken=${response.token}&email=${email}`);
+                    }else{
+                        renderPopUpAlert()
+                    }
+                }
+            });
+        }
+
+        function renderPopUpAlert(customMessage){
+            if(customMessage){
+                $('body').append(`
+                    <div class="card main-background" onclick="clearPopUp()">
+                    </div>
+                    <div class="card pop-up">
+                        <div class="card title">
+                            Warning Notification
+                        </div>
+                        <div class="card content-text">
+                            ${customMessage}
+                        </div>
+                    </div>
+                `)
+            }else{
+                $('body').append(`
+                    <div class="card main-background" onclick="clearPopUp()">
+                    </div>
+                    <div class="card pop-up">
+                        <div class="card title">
+                            Warning Notification
+                        </div>
+                        <div class="card content-text">
+                            We apologize for the inconvenience, but we are unable to create new accounts at this time.
+                            <br>
+                            <br>
+                            Thank you for your time.
+                        </div>
+                    </div>
+                `)
+            }
+        }
+
+        function clearPopUp() {
+            $('body').find('.card.main-background, .card.pop-up').remove();
+        }
+
+        function toggleVisorCard(){
+            $(`.card.visor`).toggleClass(`sign-in-shown`)
+            $(`.title.sign-in-title`).toggleClass(`hide`);
+            $(`.title.sign-up-title`).toggleClass(`hide`);
+            $(`.button.sign-in-instead`).toggleClass(`hide`);
+            $(`.button.sign-up-instead`).toggleClass(`hide`);
+        }
+    </script>
+</body>
+</html>

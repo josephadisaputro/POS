@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Companies</title>
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+</head>
+<style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        font-family: 'Roboto', sans-serif;
+    }
+    .card{
+        padding: 1vh;
+        border-radius: 10px;
+        border: none;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        background-color: white;
+        color: #007AFF;
+        box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.19), 0px 6px 6px rgba(0, 0, 0, 0.23);
+    }
+    .card.main{
+        height: 100%;
+        background-color: white;
+        gap: 1vh;
+    }
+    .card.main-background{
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        gap: 1vh;
+        border-radius: 0%;
+    }
+    .card.pop-up{
+        width: 50%;
+        position: fixed;
+        left: calc(25%);
+        top: calc(12.5%);
+        background-color: #007AFF;
+        color: white;
+    }
+    .card.title{
+        background-color: #007AFF;
+        color: white;
+        font-size: 3vh;
+    }
+    .card.header{
+        flex-direction: row;
+        flex-wrap: nowrap;
+        gap: 1vh;
+        background-color: #007AFF;
+        color: white;
+    }
+    .card.option{
+        cursor: pointer;
+    }
+    .card.body{
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 1vh;
+        height: 100%;
+    }
+    .card.form{
+        margin: 1vh;
+    }
+    .card.company{
+        height: fit-content;
+        width: 10vw;
+        background-color: #007AFF;
+        color: white;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+    }
+    .card.company .text{
+        max-width: 100%;
+        display: block;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+    .card button{
+        padding-left: 2vh;
+        padding-right: 2vh;
+        padding-top: 1vh;
+        padding-bottom: 1vh;
+        font-size: 2vh;
+        background-color: #007AFF;
+        color: white;
+        border-radius: 10px;
+        border: none;
+        box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.19), 0px 6px 6px rgba(0, 0, 0, 0.23);
+        cursor: pointer;
+        width: fit-content;
+        margin: 1vh;
+    }
+    .card .input-group{
+        margin: 1vh;
+    }
+    .card .input-group label{
+        font-size: 2vh;
+        margin: 1vh;
+    }
+    .card .input-group input{
+        font-size: 3vh;
+        margin: 1vh;
+        border-radius: 10px;
+        border: 1px solid #007AFF;
+        text-align: center;
+    }
+    .card .input-group input:focus{
+        border: 1px solid #007AFF;
+        outline: none;
+    }
+    .card.content-text{
+        margin-top: 1vh;
+        font-size: 2.5vh;
+    }
+</style>
+<body>
+    <div class="card main">
+        <div class="card header">
+            <div class="card option" onclick="renderCreateNewCompanyPopUp()">Create New Company Profile</div>
+        </div>
+        <div class="card body">
+            <diV class="card company" onclick="renderCreateNewCompanyPopUp()">
+                <div class="text">Add</div>
+            </diV>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function() {
+            getListOfCompaniesBelongingToEmailAddress()
+        });
+
+        async function getListOfCompaniesBelongingToEmailAddress(){
+            let settings = {
+                "url": `${(new URL(window.location)).origin}/api/v1/company/view/list`,
+                "method": "POST",
+                "timeout": 0,
+                "headers": {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${(new URLSearchParams(window.location.search).get("pageToken"))}`
+                },
+                "data": JSON.stringify({
+                    "email": `${(new URLSearchParams(window.location.search).get("email"))}`
+                }),
+            };
+
+            await $.ajax(settings).done(async function (response) {
+                console.log(response)
+                if(!response.companies){
+                    if(response.error == "No company is not found"){
+                        $(`body`).append(`
+                            <div class="card main-background" onclick="clearPopUp()">
+                            </div>
+                            <div class="card pop-up">
+                                <div class="card title">
+                                    Warning Notification
+                                </div>
+                                <div class="card content-text">
+                                    Welcome to easy ERP system, where you can start by creating a new company profile.
+                                    <br>
+                                    <br>
+                                    The company profile is your company, it can be a small retail business or a large corporation. You just simply click create and a pop up will appear for you to fill in. Once created, you can click on your profile and you will go straight to your company dashboard.
+                                    <br>
+                                    <br>
+                                    Please remember that if you are the creator of a company then you will be the admin of the company you created. If you are an employee of a company that already has access to this ERP system, you can simply ask your supervisor to help to add you to the company. Then your company will be on your company list without you needing to create it.
+                                </div>
+                            </div>
+                        `)
+                    }else if(response.error == "Token not valid" || response.error == "Email not valid"){
+                        window.location.replace((new URL(window.location)).origin  );
+                    }else{
+                        $(`body`).append(`
+                            <div class="card main-background" onclick="clearPopUp()">
+                            </div>
+                            <div class="card pop-up">
+                                <div class="card title">
+                                    Warning Notification
+                                </div>
+                                <div class="card content-text">
+                                    We apologize for the inconvenience, but we were unable to obtain a list of companies for your profile. 
+                                    <br>
+                                    <br>
+                                    please try again later or just refresh the page.
+                                </div>
+                            </div>
+                        `)
+                    }
+                }else{
+                    for(const eachCompany of response.companies){
+                        $(`.card.body`).empty()
+                        $(`.card.body`).append(`
+                            <diV class="card company" onclick="RedirectToCompanyDashboard('${eachCompany.uuid}')">
+                                <div class="text">${eachCompany.companyName}</div>
+                            </diV>
+                        `)
+                    }
+                }
+            });
+        }
+
+        function RedirectToCompanyDashboard(uuid){
+            window.location.replace(`${(new URL(window.location)).origin}/page/dashboard-desktop?pageToken=${(new URLSearchParams(window.location.search)).get("pageToken")}&email=${(new URLSearchParams(window.location.search)).get("email")}&uuid=${uuid}`);
+        }
+
+        function clearPopUp() {
+            $('body').find('.card.main-background, .card.pop-up').remove();
+        }
+
+        function renderCreateNewCompanyPopUp(){
+            $('body').append(`
+                <div class="card main-background" onclick="clearPopUp()">
+
+                </div>
+                <div class="card pop-up">
+                    <div class="card title">
+                        Create New Company
+                    </div>
+                    <div class="card form">
+                        <div class="card input-group">
+                            <label>Company Name</label>
+                            <input id="new-company-name" type="text"/>
+                        </div>
+                        <div class="card input-group">
+                            <label>Npwp Number</label>
+                            <input id="new-company-npwp" type="text"/>
+                        </div>
+                        <button onclick="createNewCompany()">
+                            Submit
+                        </button>
+                    </div>
+                </div>
+            `)
+        }
+
+        async function createNewCompany(){
+            let companyName = $("#new-company-name").val()
+            let companyNpwp = $("#new-company-npwp").val()
+            await createNewCompanyProfile(companyNpwp, companyNpwp, token)
+        }
+
+        async function createNewCompanyProfile(companyName, npwp, token){
+            let settings = {
+                "url": `${(new URL(window.location)).origin}/api/v1/company/create`,
+                "method": "POST",
+                "timeout": 0,
+                "headers": {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${(new URLSearchParams(window.location.search).get("pageToken"))}`
+                },
+                "data": JSON.stringify({
+                    "email": `${(new URLSearchParams(window.location.search).get("email"))}`,
+                    "companyName": `${companyName}`,
+                    "npwp": `${npwp}`
+                }),
+            };
+
+            await $.ajax(settings).done(async function (response) {
+                console.log(response)
+                if(!response.uuid){
+                    $(`body`).append(`
+                        <div class="card main-background" onclick="clearPopUp()">
+                        </div>
+                        <div class="card pop-up">
+                            <div class="card title">
+                                Warning Notification
+                            </div>
+                            <div class="card content-text">
+                                We apologize for the inconvenience, but we are unable to create a new company at this time, please try again later. 
+                                <br>
+                                <br>
+                                Thank you for your time.
+                            </div>
+                        </div>
+                    `)
+                }
+            });
+        }
+        
+    </script>
+</body>
+</html>

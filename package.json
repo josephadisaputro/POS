@@ -1,22 +1,21 @@
 {
-  "name": "pos",
+  "name": "02012024_erp",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
   },
   "author": "Yusuf Adisaputro",
   "license": "ISC",
   "dependencies": {
-    "axios": "^0.27.2",
     "cors": "^2.8.5",
-    "dotenv": "^16.0.2",
-    "excel4node": "^1.8.0",
-    "express": "^4.18.1",
-    "json-as-xlsx": "^2.4.2",
-    "nodemon": "^2.0.19",
-    "nosql": "^6.1.0",
-    "save": "^2.5.0"
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "nodemon": "^3.0.2",
+    "uuid": "^9.0.1",
+    "xlsx": "^0.18.5"
   }
 }
