@@ -10,6 +10,7 @@ class Inventory {
         this.userObject = userObject
         this.tokenObject = new tokenClass()
         this.tempDatabaseObject = new tempDatabaseClass()
+        this.uamObject = new uamClass()
     }
 
     async createNewCustomer(token, payload) {
@@ -59,6 +60,7 @@ class Inventory {
             }
     
             // Append additional keys to payload
+            payload.lastUpdated = new Date();
             payload.isDeleted = false;
             payload.history = JSON.stringify([]);
     
@@ -90,7 +92,7 @@ class Inventory {
                 throw new Error('Payload must be an object');
             }
     
-            // Check if customer with same UUID exists and is not deleted
+            // Check if customer with same ID exists and is not deleted
             let customers;
             try {
                 customers = await this.tempDatabaseObject.read(payload.companyUUID, -1, -1, "customerID", payload.customerID);
@@ -160,8 +162,11 @@ class Inventory {
         }
     }    
     
-    async deleteCustomer(payload) {
+    async deleteCustomer(token, payload) {
         try {
+            // Verify the token
+            await this.userObject.verifyToken(token);
+
             // Check if payload is an object
             if (typeof payload !== 'object') {
                 throw new Error('Payload must be an object');
@@ -178,6 +183,11 @@ class Inventory {
                 throw new Error('No customer found with the provided UUID or the customer is deleted');
             }
 
+            // Check if editorEmail is valid
+            if (payload.editorEmail && !/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(payload.editorEmail)) {
+                throw new Error(`editorEmail must be a valid email address`);
+            }
+
             // Check if the user has the necessary permissions
             const findCompanyUUID = await this.tempDatabaseObject.read(this.companyFilename, -1, -1, "uuid", payload.companyUUID);
             const employees = JSON.parse(findCompanyUUID[0].employees);
@@ -185,7 +195,7 @@ class Inventory {
             if (findEmployee == -1) {
                 throw new Error('Not an employee');
             } else {
-                if (!await this.uamObject.verifyAccess(employees[findEmployee].uam, "customerManagement", "Edit")) {
+                if (!await this.uamObject.verifyAccess(employees[findEmployee].uam, "customerManagement", "Delete")) {
                     throw new Error('Access not granted');
                 }
             }
@@ -221,7 +231,7 @@ class Inventory {
         }
     }
 
-    async getCustomerDetail(token, companyUUID, customerID) {
+    async getCustomerDetail(token, editorEmail, companyUUID, customerID) {
         try {
             // Verify the token
             await this.userObject.verifyToken(token);
@@ -247,7 +257,7 @@ class Inventory {
             // Check if the user has the necessary permissions
             const findCompanyUUID = await this.tempDatabaseObject.read(this.companyFilename, -1, -1, "uuid", companyUUID);
             const employees = JSON.parse(findCompanyUUID[0].employees);
-            const findEmployee = employees.findIndex(obj => obj.email == payload.editorEmail);
+            const findEmployee = employees.findIndex(obj => obj.email == editorEmail);
             if (findEmployee == -1) {
                 throw new Error('Not an employee');
             } else {
@@ -268,7 +278,7 @@ class Inventory {
         }
     }
 
-    async getCustomerList(token, companyUUID, page, size) {
+    async getCustomerList(token, editorEmail, companyUUID, page, size) {
         try {
             // Verify the token
             await this.userObject.verifyToken(token);
@@ -286,7 +296,7 @@ class Inventory {
             // Check if the user has the necessary permissions
             const findCompanyUUID = await this.tempDatabaseObject.read(this.companyFilename, -1, -1, "uuid", companyUUID);
             const employees = JSON.parse(findCompanyUUID[0].employees);
-            const findEmployee = employees.findIndex(obj => obj.email == payload.editorEmail);
+            const findEmployee = employees.findIndex(obj => obj.email == editorEmail);
             if (findEmployee == -1) {
                 throw new Error('Not an employee');
             } else {

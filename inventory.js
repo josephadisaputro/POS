@@ -6,13 +6,36 @@ require('dotenv').config()
 
 class Inventory {
     constructor(userObject) {
+        this.companyFilename =  process.env.companyTable
         this.userObject = userObject
         this.tokenObject = new tokenClass()
         this.tempDatabaseObject = new tempDatabaseClass()
+        this.uamObject = new uamClass()
     }
 
-    async getItemList(companyUUID, page, size) {
+    async checkAccessValidity(companyUUID, editorEmail, action){
         try {
+            // Check if the user has the necessary permissions
+            const findCompanyUUID = await this.tempDatabaseObject.read(this.companyFilename, -1, -1, "uuid", companyUUID);
+            const employees = JSON.parse(findCompanyUUID[0].employees);
+            const findEmployee = employees.findIndex(obj => obj.email == editorEmail);
+            if (findEmployee == -1) {
+                throw new Error('Not an employee');
+            } else {
+                if (!await this.uamObject.verifyAccess(employees[findEmployee].uam, "inventory", action)) {
+                    throw new Error('Access not granted');
+                }
+            }
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getItemList(token, companyUUID, editorEmail, page, size) {
+        try {
+            // Verify the token
+            await this.userObject.verifyToken(token);
+
             // Check if companyUUID, page, and size are provided
             if (!companyUUID || !page || !size) {
                 throw new Error('companyUUID, page, and size must be provided');
@@ -22,6 +45,9 @@ class Inventory {
             if (page < 1 || size < 1) {
                 throw new Error('page and size must be at least 1');
             }
+
+            // Check if the user has the necessary permissions
+            await this.checkAccessValidity(companyUUID, editorEmail, "View")
     
             // Read the items from the database
             let items;
@@ -31,24 +57,25 @@ class Inventory {
                 throw new Error(`Error reading from database: ${error.message}`);
             }
     
-            // Check if items exist
-            if (items.length === 0) {
-                throw new Error('No items found');
-            }
-    
             // Return the items
             return items;
         } catch (error) {
-            console.error(error.message);
+            throw error.message;
         }
     }    
 
-    async getItemDetail(companyUUID, itemSKU, itemUUID) {
+    async getItemDetail(token, companyUUID, editorEmail, itemSKU, itemUUID) {
         try {
+            // Verify the token
+            await this.userObject.verifyToken(token);
+
             // Check if itemSKU and itemUUID are provided
             if (!itemSKU || !itemUUID) {
                 throw new Error('Both itemSKU and itemUUID must be provided');
             }
+
+            // Check if the user has the necessary permissions
+            await this.checkAccessValidity(companyUUID, editorEmail, "View")
     
             // Read the item from the database
             let items;
@@ -76,13 +103,16 @@ class Inventory {
             // Return the item details
             return items[0];
         } catch (error) {
-            console.error(error.message);
+            throw error.message;
         }
     }    
 
-    async createNewItem(payload) {
+    async createNewItem(token, payload) {
         return new Promise(async (resolve, reject) => {
             try {
+                // Verify the token
+                await this.userObject.verifyToken(token);
+
                 // Check if payload is an object
                 if (typeof payload !== 'object') {
                     throw new Error('Payload must be an object');
@@ -114,6 +144,9 @@ class Inventory {
                         throw new Error(`Key ${key} must be a valid email address`);
                     }
                 }
+
+                // Check if the user has the necessary permissions
+                await this.checkAccessValidity(payload.companyUUID, payload.editorEmail, "Create")
     
                 // Append additional keys to payload
                 payload.isDeleted = false;
@@ -144,16 +177,19 @@ class Inventory {
                     throw new Error('Database write operation failed');
                 }
     
-                resolve(payload);
+                resolve(payload.itemUUID);
             } catch (error) {
                 reject(new Error(`${error.message}`));
             }
         });
     }
 
-    async editExistingItem(payload) {
+    async editExistingItem(token, payload) {
         return new Promise(async (resolve, reject) => {
             try {
+                // Verify the token
+                await this.userObject.verifyToken(token);
+
                 // Check if payload is an object
                 if (typeof payload !== 'object') {
                     throw new Error('Payload must be an object');
@@ -187,6 +223,9 @@ class Inventory {
                         throw new Error(`Key ${key} does not exist in the existing item`);
                     }
                 }
+
+                // Check if the user has the necessary permissions
+                await this.checkAccessValidity(payload.companyUUID, payload.editorEmail, "Edit")
     
                 // Update lastUpdated and editorEmail fields
                 payload.lastUpdated = new Date();
@@ -305,9 +344,12 @@ class Inventory {
         });
     }
 
-    async deleteItem(payload) {
+    async deleteItem(token, payload) {
         return new Promise(async (resolve, reject) => {
             try {
+                // Verify the token
+                await this.userObject.verifyToken(token);
+
                 // Check if payload is an object
                 if (typeof payload !== 'object') {
                     throw new Error('Payload must be an object');
@@ -348,6 +390,9 @@ class Inventory {
                 if (itemsWithSameSKU.length > 0 && itemsWithSameSKU[0].itemUUID !== payload.itemUUID) {
                     throw new Error('There is an item with the same SKU, but different UUID');
                 }
+
+                // Check if the user has the necessary permissions
+                await this.checkAccessValidity(payload.companyUUID, payload.editorEmail, "Edit")
     
                 // Set isDeleted to true and keep the rest of the keys from the existing item
                 items[0].isDeleted = true;

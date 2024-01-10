@@ -219,27 +219,57 @@ app.post('/api/v1/menu/view/list', async function (req, res, next) {
     }
 })
 
-app.post('/api/v1/sales-order/create', async function (req, res, next) {
-    try{
-        const authHeader = req.headers['authorization'];
-        const token = authHeader && authHeader.split(' ')[1];
-
-        if (token == null){
-            res.sendStatus(401)
-            return
-        }
-
-        if(typeof req.body === 'object' && req.body !== null){
-            res.json({
-                menus: await inventoryObject
-            })
-        }
-    }catch(e){
+app.post('/api/v1/item/create', async (req, res) => {
+    try {
+        const token = req.headers.authorization.split(' ')[1];
+        const payload = req.body;
+        const result = await inventoryObject.createNewItem(token, payload);
         res.json({
-            error: e
-        })
+            itemUUID: result
+        });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
     }
-})
+});
+
+app.post('/api/v1/item/edit', async (req, res) => {
+    try {
+        const token = req.headers.authorization.split(' ')[1];
+        const payload = req.body;
+        const result = await inventoryObject.editExistingItem(token, payload);
+        res.json({
+            item: result
+        });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+app.post('/api/v1/item/view', async (req, res) => {
+    try {
+        const token = req.headers.authorization.split(' ')[1];
+        const payload = req.body;
+        const result = await inventoryObject.getItemDetail(token, payload.companyUUID, payload.editorEmail, payload.itemSKU, payload.itemUUID);
+        res.json({
+            item: result
+        });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
+
+app.post('/api/v1/item/view/list', async (req, res) => {
+    try {
+        const token = req.headers.authorization.split(' ')[1];
+        const payload = req.body;
+        const result = await inventoryObject.getItemList(token, payload.companyUUID, payload.editorEmail, payload.page, payload.size);
+        res.json({
+            items: result
+        });
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
 
 app.listen(80, function () {
     console.log('CORS-enabled web server listening on port 80')
