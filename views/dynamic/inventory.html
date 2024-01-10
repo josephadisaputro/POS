@@ -13,12 +13,23 @@
         <div class="card body-table">
             
         </div>
+        <div class="card footer-table">
+            <div class="text" onclick="getItemListAPI('-1')">Previous</div>
+            <div class="text blue">Page :</div>
+            <div class="text" onclick="getItemListAPI('1')">Next</div>
+        </div>
     </div>
 </div>
 <script>
+    let page = 1;
+    let size = 10;
     getItemListAPI()
     
-    async function getItemListAPI(page, size){
+    async function getItemListAPI(incrementDecrement = 0){
+        page = page + (incrementDecrement * 1)
+        if(page < 1){
+            page = 0
+        }
         let settings = {
             "url": `${(new URL(window.location)).origin}/api/v1/item/view/list`,
             "method": "POST",
@@ -36,7 +47,6 @@
         };
 
         await $.ajax(settings).done(async function (response) {
-            console.log(response)
             if(!response.items){
                 $(`body`).append(`
                     <div class="card main-background" onclick="clearPopUp()">
@@ -51,27 +61,31 @@
                     </div>
                 `)
             }else{
+                $(`.card.body-table`).empty()
                 for(const eachItem of response.items){
-                    $(`.card.body-table`).empty()
                     $(`.card.body-table`).append(`
                         <div class="card body-row-table">
                             <div class="text action-buttons-group">
-                                <div class="action-button">
+                                <div class="action-button" onclick="editItem('${eachItem.itemSKU}', '${eachItem.companyUUID}')">
                                     Edit
                                 </div>
-                                <div class="action-button">
+                                <div class="action-button" onclick="viewItemDetails('${eachItem.itemSKU}', '${eachItem.companyUUID}')">
                                     View Details
                                 </div>
                             </div>
                             <div class="text">${eachItem.itemName}</div>
                             <div class="text">${eachItem.itemSKU}</div>
-                            <div class="text">${eachItem.itemQty}</div>
-                            <div class="text">${eachItem.itemSellPrice}</div>
+                            <div class="text">${eachItem.itemQty} ${eachItem.itemQtyUnit}</div>
+                            <div class="text">${eachItem.itemCurrencySellPrice} ${eachItem.itemSellPrice}</div>
                         </div>
                     `)
                 }
             }
         });
+
+        function editItem(itemSKU, companyUUID){
+
+        }
     }
 
 </script>

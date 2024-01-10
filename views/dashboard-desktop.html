@@ -388,12 +388,41 @@
         overflow: hidden;
         white-space: nowrap;
     }
+    .table .card.footer-table{
+        flex-direction: row;
+        gap: 0.5vh;
+        background-color: #007AFF;
+        color: white;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: calc(100% - 2vh);
+    }
+    .table .card.footer-table .text{
+        background-color: white;
+        color: #007AFF;
+        border-radius: 10px;
+        box-shadow: none;
+        text-align: center;
+        font-size: 2vh;
+        margin-left: 0.5vh;
+        margin-right: 0.5vh;
+        width: calc((100% / 3));
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+    .table .card.footer-table .text.blue{
+        background-color: #007AFF;
+        color: white;
+    }
     .table .card.body-table {
         background-color: #007AFF;
         position: absolute;
-        top: calc(4vh + 2vh);
+        top: calc(4vh + 1vh);
         left: 0;
         width: calc(100% - 2vh);
+        height: calc(100% - 12vh);
         box-shadow: none;
         flex-direction: column;
         flex-wrap: nowrap;
@@ -746,7 +775,7 @@
 
         async function renderMenuAPI(menu){
             let settings = {
-                "url": `${(new URL(window.location)).origin}/sub-page/${menu}?pageToken=${(new URLSearchParams(window.location.search)).get("pageToken")}&email=${(new URLSearchParams(window.location.search)).get("email")}&uuid=${uuid}`,
+                "url": `${(new URL(window.location)).origin}/sub-page/${menu}?pageToken=${(new URLSearchParams(window.location.search)).get("pageToken")}&email=${(new URLSearchParams(window.location.search)).get("email")}&uuid=${(new URLSearchParams(window.location.search).get("uuid"))}`,
                 "method": "GET",
                 "timeout": 0,
                 "headers": {
@@ -761,6 +790,7 @@
                         ${response}
                     `)
                 }
+                console.log(response)
             });
         }
 
@@ -780,7 +810,6 @@
             };
 
             await $.ajax(settings).done(async function (response) {
-                console.log(response)
                 if(!response.menus){
                     $(`body`).append(`
                         <div class="card main-background" onclick="clearPopUp()">
@@ -795,8 +824,8 @@
                         </div>
                     `)
                 }else{
+                    $(`.card.menu-bar`).empty()
                     for(const eachMenu of response.menus){
-                        $(`.card.menu-bar`).empty()
                         $(`.card.menu-bar`).append(`
                             <div id="company-profile-menu" class="card menu-element" onclick="renderMenu('${eachMenu.menu}')">
                                 <div class="menu-title">${eachMenu.menuName}</div>
