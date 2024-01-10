@@ -36,24 +36,19 @@ class UAM {
         try{
             const matrix = await this.readMatrix()
             let findAccess = matrix.filter(obj => obj.Role == role && obj.AccessDashboard == true)
-            console.log(findAccess)
             if(findAccess.length > 0){
                 const menuNames = findAccess.map(obj => ({
                     menuName: obj['Menu Name'],
                     menu: obj['Menu']
                 }));
-                console.log(menuNames)
                 return menuNames
             }else{
                 findAccess = matrix.filter(obj => obj.Role == role && obj.AccessDashboard == false)
-                console.log("============================================== 2")
-                console.log(findAccess)
                 if(findAccess.length > 0){
                     const menuNames = findAccess.map(obj => ({
                         menuName: obj['Menu Name'],
                         menu: obj['Menu']
                     }));
-                    console.log(menuNames)
                     return menuNames
                 }else{
                     throw `No menu is available for access`
