@@ -31,11 +31,11 @@ class Inventory {
         }
     }
 
-    async getItemList(token, companyUUID, editorEmail, page, size) {
+    async getItemList(token, companyUUID, editorEmail, page, size, sort = null) {
         try {
             // Verify the token
             await this.userObject.verifyToken(token);
-
+    
             // Check if companyUUID, page, and size are provided
             if (!companyUUID || !page || !size) {
                 throw new Error('companyUUID, page, and size must be provided');
@@ -45,14 +45,19 @@ class Inventory {
             if (page < 1 || size < 1) {
                 throw new Error('page and size must be at least 1');
             }
-
+    
             // Check if the user has the necessary permissions
             await this.checkAccessValidity(companyUUID, editorEmail, "View")
+    
+            // If sort is provided, it can only be 'asc' or 'desc'
+            if (sort && sort !== 'asc' && sort !== 'desc') {
+                throw new Error('sort can only be asc or desc');
+            }
     
             // Read the items from the database
             let items;
             try {
-                items = await this.tempDatabaseObject.read(companyUUID, page, size, null, null);
+                items = await this.tempDatabaseObject.read(companyUUID, page, size, null, null, sort);
             } catch (error) {
                 throw new Error(`Error reading from database: ${error.message}`);
             }
@@ -62,7 +67,7 @@ class Inventory {
         } catch (error) {
             throw error.message;
         }
-    }    
+    }      
 
     async getItemDetail(token, companyUUID, editorEmail, itemSKU, itemUUID) {
         try {
@@ -112,23 +117,23 @@ class Inventory {
             try {
                 // Verify the token
                 await this.userObject.verifyToken(token);
-
+    
                 // Check if payload is an object
                 if (typeof payload !== 'object') {
                     throw new Error('Payload must be an object');
                 }
     
                 // Check if payload has the required keys and their types
-                const requiredKeys = ['companyUUID', 'itemSKU', 'itemName', 'itemQty', 'itemQtyUnit', 'itemNotes', 'itemSellPrice', 'itemPurchasePrice', 'itemCurrencySellPrice', 'itemCurrencyBuyPrice', 'editorEmail'];
+                const requiredKeys = ['companyUUID', 'itemSKU', 'itemName', 'itemQty', 'itemQtyUnit', 'itemNotes', 'itemSellPrice', 'itemPurchasePrice', 'itemCurrencySellPrice', 'itemCurrencyBuyPrice', 'editorEmail', 'storageLocationName', 'storageLocationAddress'];
                 const validCurrencies = ["USD", "IDR", "CNY", "MYR", "SGD", "AUD", "EUR", "GBP"];
                 for (const key of requiredKeys) {
                     if (!payload.hasOwnProperty(key)) {
                         throw new Error(`Payload is missing key: ${key}`);
                     }
-                    if (payload[key] === null || payload[key] === undefined) {
+                    if (payload[key] === null || payload[key] === undefined || payload[key] === '') {
                         throw new Error(`Key ${key} must have a value`);
                     }
-                    if ((key === 'itemName' || key === 'itemQtyUnit' || key === 'itemNotes' || key === 'itemCurrencySellPrice' || key === 'itemCurrencyBuyPrice' || key === 'editorEmail') && typeof payload[key] !== 'string') {
+                    if ((key === 'itemName' || key === 'itemQtyUnit' || key === 'itemNotes' || key === 'itemCurrencySellPrice' || key === 'itemCurrencyBuyPrice' || key === 'editorEmail' || key === 'storageLocationName' || key === 'storageLocationAddress') && typeof payload[key] !== 'string') {
                         throw new Error(`Key ${key} must be a string`);
                     }
                     if (key === 'itemQty' && !Number.isInteger(payload[key])) {
@@ -144,7 +149,7 @@ class Inventory {
                         throw new Error(`Key ${key} must be a valid email address`);
                     }
                 }
-
+    
                 // Check if the user has the necessary permissions
                 await this.checkAccessValidity(payload.companyUUID, payload.editorEmail, "Create")
     
@@ -161,8 +166,18 @@ class Inventory {
                 } catch (error) {
                     throw new Error(`Error reading from database: ${error.message}`);
                 }
-                if (items.length > 0 && items[0].isDeleted === false) {
-                    throw new Error('There is an item with the same SKU, please use a different SKU');
+                if (items.length > 0) {
+                    // for future where we allow multiple storage location for the same item
+                    // let storageLocationName = payload.storageLocationName.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").toLowerCase().trim();
+                    // let storageLocationAddress = payload.storageLocationAddress.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").toLowerCase().trim();
+                    // let existingStorageLocationName = items[0].storageLocationName.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").toLowerCase().trim();
+                    // let existingStorageLocationAddress = items[0].storageLocationAddress.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").toLowerCase().trim();
+                    // if (items[0].isDeleted === false && (storageLocationName === existingStorageLocationName && storageLocationAddress === existingStorageLocationAddress)) {
+                    //     throw new Error('There is an item with the same SKU and storage location, please use a different SKU or storage location');
+                    // }
+                    if (items[0].isDeleted === false) {
+                        throw new Error('Duplicate SKU found, please use a different SKU');
+                    }
                 }
     
                 // Write to database
@@ -179,10 +194,10 @@ class Inventory {
     
                 resolve(payload.itemUUID);
             } catch (error) {
-                reject(new Error(`${error.message}`));
+                reject(error);
             }
         });
-    }
+    }    
 
     async editExistingItem(token, payload) {
         return new Promise(async (resolve, reject) => {

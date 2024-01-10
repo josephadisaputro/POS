@@ -302,7 +302,7 @@ app.post('/api/v1/item/view/list', async (req, res) => {
     try {
         const token = req.headers.authorization.split(' ')[1];
         const payload = req.body;
-        const result = await inventoryObject.getItemList(token, payload.companyUUID, payload.editorEmail, payload.page, payload.size);
+        const result = await inventoryObject.getItemList(token, payload.companyUUID, payload.editorEmail, payload.page, payload.size, payload.sort? payload.sort:null);
         res.json({
             items: result
         });
