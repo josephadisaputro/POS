@@ -260,6 +260,10 @@
         </div>
         <div class="card sign-up-form">
             <div class="grouped-input">
+                <label>Full Name</label>
+                <input id="sign-up-fullname" type="text" placeholder="Full Name" />
+            </div>
+            <div class="grouped-input">
                 <label>Email</label>
                 <input id="sign-up-email" type="email" placeholder="email@email.com" />
             </div>
@@ -278,14 +282,6 @@
             <div class="grouped-input">
                 <label>Phone Number</label>
                 <input id="sign-up-phone-number" type="tel" placeholder="08XX XXXX XXXX" />
-            </div>
-            <div class="grouped-input">
-                <label>Addess</label>
-                <input id="sign-up-address" type="text" placeholder="addresss" />
-            </div>
-            <div class="grouped-input">
-                <label>Postcode</label>
-                <input id="sign-up-postcode" type="number" placeholder="15XXX">
             </div>
             <div class="grouped-input">
                 <button id="sign-up-now-button" class="button enter" onclick="signupRequest()">Sign-up</button>
@@ -352,12 +348,11 @@
             let email = $(`#sign-up-email`).val()
             let password = $(`#sign-up-password`).val()
             let phoneNumber = $(`#sign-up-phone-number`).val()
-            let address = $(`#sign-up-address`).val()
-            let postcode = $(`#sign-up-postcode`).val()
-            signUpApiCall(email, password, phoneNumber, address, postcode);
+            let fullName = $(`#sign-up-fullname`).val()
+            signUpApiCall(email, password, phoneNumber, fullName);
         }
 
-        async function signUpApiCall(email, password, phoneNumber, address, postcode){
+        async function signUpApiCall(email, password, phoneNumber, fullName){
             let settings = {
                 "url": "./api/v1/sign-up",
                 "method": "POST",
@@ -369,8 +364,7 @@
                     "email": `${email}`,
                     "password": `${password}`,
                     "phoneNumber": `${phoneNumber}`,
-                    "address": `${address}`,
-                    "postcode": `${postcode}`
+                    "fullName": `${fullName}`
                 }),
             };
 

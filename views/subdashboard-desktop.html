@@ -243,6 +243,22 @@
                             <label>Npwp Number</label>
                             <input id="new-company-npwp" type="text"/>
                         </div>
+                        <div class="card input-group">
+                            <label>Company Address Line 1</label>
+                            <input id="new-company-address-1" type="text"/>
+                        </div>
+                        <div class="card input-group">
+                            <label>Company Address Line 2</label>
+                            <input id="new-company-address-2" type="text"/>
+                        </div>
+                        <div class="card input-group">
+                            <label>Company Contact Number 1</label>
+                            <input id="new-company-contact-number-1" type="text"/>
+                        </div>
+                        <div class="card input-group">
+                            <label>Company Contact Number 1</label>
+                            <input id="new-company-contact-number-2" type="text"/>
+                        </div>
                         <button onclick="createNewCompany()">
                             Submit
                         </button>
@@ -254,10 +270,14 @@
         async function createNewCompany(){
             let companyName = $("#new-company-name").val()
             let companyNpwp = $("#new-company-npwp").val()
-            await createNewCompanyProfile(companyNpwp, companyNpwp, token)
+            let companyAddress1 = $("#new-company-address-1").val()
+            let companyAddress2 = $("#new-company-address-2").val()
+            let companyContact1 = $("#new-company-contact-number-1").val()
+            let companyContact2= $("#new-company-contact-number-2").val()
+            await createNewCompanyProfile(companyNpwp, companyNpwp, companyAddress1, companyAddress2, companyContact1, companyContact2, token)
         }
 
-        async function createNewCompanyProfile(companyName, npwp, token){
+        async function createNewCompanyProfile(companyName, npwp, companyAddress1, companyAddress2, companyContact1, companyContact2, token){
             let settings = {
                 "url": `${(new URL(window.location)).origin}/api/v1/company/create`,
                 "method": "POST",
@@ -269,7 +289,11 @@
                 "data": JSON.stringify({
                     "email": `${(new URLSearchParams(window.location.search).get("email"))}`,
                     "companyName": `${companyName}`,
-                    "npwp": `${npwp}`
+                    "npwp": `${npwp}`,
+                    "companyAddress1": `${companyAddress1}`,
+                    "companyAddress2": `${companyAddress2}`,
+                    "companyContact1": `${companyContact1}`,
+                    "companyContact2": `${companyContact2}`
                 }),
             };
 
