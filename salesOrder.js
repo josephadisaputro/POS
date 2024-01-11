@@ -262,11 +262,7 @@ class salesOrder {
                 } catch (error) {
                     throw new Error(`Error updating the database: ${error.message}`);
                 }
-    
-                if (!updateResult) {
-                    throw new Error('Database update operation failed');
-                }
-    
+
                 resolve(payload);
             } catch (error) {
                 reject(new Error(`${error.message}`));
@@ -347,11 +343,7 @@ class salesOrder {
                 } catch (error) {
                     throw new Error(`Error updating the database: ${error.message}`);
                 }
-    
-                if (!updateResult) {
-                    throw new Error('Database update operation failed');
-                }
-    
+                
                 resolve(payload);
             } catch (error) {
                 reject(new Error(`${error.message}`));
@@ -429,11 +421,7 @@ class salesOrder {
                 } catch (error) {
                     throw new Error(`Error updating the database: ${error.message}`);
                 }
-    
-                if (!updateResult) {
-                    throw new Error('Database update operation failed');
-                }
-    
+
                 resolve(items[0]);
             } catch (error) {
                 reject(new Error(`${error.message}`));

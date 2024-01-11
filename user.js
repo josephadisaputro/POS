@@ -181,6 +181,7 @@ class User{
             await this.verifyToken(token)
             if(payload.email){
                 const findAllCompanies = await this.tempDatabaseObject.read(this.companyFilename, -1, -1)
+                console.log(findAllCompanies)
                 const findCompaniesWhereEmployeeIsEmail = await findAllCompanies.filter(obj => 
                     JSON.parse(obj.employees).some(objE => objE.email === payload.email)
                 );

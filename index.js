@@ -267,8 +267,9 @@ app.post('/api/v1/item/create', async (req, res) => {
         res.json({
             itemUUID: result
         });
+        return 
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        res.json({ error: error.message });
     }
 });
 
@@ -281,7 +282,20 @@ app.post('/api/v1/item/edit', async (req, res) => {
             item: result
         });
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        res.json({ error: error.message });
+    }
+});
+
+app.post('/api/v1/item/delete', async (req, res) => {
+    try {
+        const token = req.headers.authorization.split(' ')[1];
+        const payload = req.body;
+        const result = await inventoryObject.deleteItem(token, payload);
+        res.json({
+            item: result
+        });
+    } catch (error) {
+        res.json({ error: error.message });
     }
 });
 
@@ -289,12 +303,14 @@ app.post('/api/v1/item/view', async (req, res) => {
     try {
         const token = req.headers.authorization.split(' ')[1];
         const payload = req.body;
+        console.log(payload)
         const result = await inventoryObject.getItemDetail(token, payload.companyUUID, payload.editorEmail, payload.itemSKU, payload.itemUUID);
+        console.log(result)
         res.json({
             item: result
         });
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        res.json({ error: error.message });
     }
 });
 
@@ -307,7 +323,7 @@ app.post('/api/v1/item/view/list', async (req, res) => {
             items: result
         });
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        res.json({ error: error.message });
     }
 });
 

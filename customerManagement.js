@@ -152,10 +152,6 @@ class Inventory {
                 throw new Error(`Error updating the database: ${error.message}`);
             }
     
-            if (!updateResult) {
-                throw new Error('Database update operation failed');
-            }
-    
             return payload;
         } catch (error) {
             console.error(error.message);
@@ -219,10 +215,6 @@ class Inventory {
                 updateResult = await this.tempDatabaseObject.update(payload.companyUUID, customers[0], "customerID", payload.customerID);
             } catch (error) {
                 throw new Error(`Error updating the database: ${error.message}`);
-            }
-    
-            if (!updateResult) {
-                throw new Error('Database update operation failed');
             }
     
             return customers[0];

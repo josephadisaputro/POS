@@ -57,7 +57,7 @@ class Inventory {
             // Read the items from the database
             let items;
             try {
-                items = await this.tempDatabaseObject.read(companyUUID, page, size, null, null, sort);
+                items = await this.tempDatabaseObject.read(companyUUID, page, size, null, null, sort, "isDeleted", false);
             } catch (error) {
                 throw new Error(`Error reading from database: ${error.message}`);
             }
@@ -125,7 +125,7 @@ class Inventory {
     
                 // Check if payload has the required keys and their types
                 const requiredKeys = ['companyUUID', 'itemSKU', 'itemName', 'itemQty', 'itemQtyUnit', 'itemNotes', 'itemSellPrice', 'itemPurchasePrice', 'itemCurrencySellPrice', 'itemCurrencyBuyPrice', 'editorEmail', 'storageLocationName', 'storageLocationAddress'];
-                const validCurrencies = ["USD", "IDR", "CNY", "MYR", "SGD", "AUD", "EUR", "GBP"];
+                const validCurrencies = ["USD", "IDR", "CNY", "MYR", "SGD", "AUD", "EUR", "GBP", "HKD"];
                 for (const key of requiredKeys) {
                     if (!payload.hasOwnProperty(key)) {
                         throw new Error(`Payload is missing key: ${key}`);
@@ -156,8 +156,10 @@ class Inventory {
                 // Append additional keys to payload
                 payload.isDeleted = false;
                 payload.history = JSON.stringify([]);
-                payload.itemUUID = this.tokenObject.getNewUUID();
+                payload.itemUUID = await this.tokenObject.getNewUUID();
                 payload.lastUpdated = new Date();
+
+                console.log(payload.itemUUID)
     
                 // Check if item with same SKU exists
                 let items;
@@ -186,10 +188,6 @@ class Inventory {
                     writeResult = await this.tempDatabaseObject.write(payload.companyUUID, payload);
                 } catch (error) {
                     throw new Error(`Error writing to database: ${error.message}`);
-                }
-    
-                if (!writeResult) {
-                    throw new Error('Database write operation failed');
                 }
     
                 resolve(payload.itemUUID);
@@ -232,10 +230,16 @@ class Inventory {
                     throw new Error('There is an item with the same SKU, but different UUID');
                 }
     
-                // Check if keys in payload are the same as existing item
+                // Check if items[0] has all keys that payload has
                 for (const key in payload) {
                     if (!items[0].hasOwnProperty(key)) {
-                        throw new Error(`Key ${key} does not exist in the existing item`);
+                        throw new Error(`Key ${key} does not exist in the existing item`)
+                    }
+                }
+
+                for (const key in items[0]) {
+                    if (!payload.hasOwnProperty(key)) {
+                        payload[key] = item[0].key
                     }
                 }
 
@@ -247,24 +251,22 @@ class Inventory {
                 payload.editorEmail = payload.editorEmail;
     
                 // Update history field
-                if (payload.history) {
-                    let history = JSON.parse(payload.history);
-                    items[0].lastUpdated = new Date();
-                    items[0].action = "edited-by-user";
-                    history.push(items[0]);
-                    payload.history = JSON.stringify(history);
-                }
+                let history = JSON.parse(items[0].history);
+                items[0].lastUpdated = new Date();
+                items[0].action = "last-edited-by-user";
+                payload.action = "edited-by-user";
+                history.push(items[0]);
+                payload.history = JSON.stringify(history);
+                payload.isDeleted = items[0].isDeleted;
     
                 // Update the item in the database
                 let updateResult;
                 try {
+                    console.log("___________________________ PAYLOAD UPDATE INVENTORY ___________________________")
+                    console.log(payload)
                     updateResult = await this.tempDatabaseObject.update(payload.companyUUID, payload, "itemUUID", payload.itemUUID);
                 } catch (error) {
                     throw new Error(`Error updating the database: ${error.message}`);
-                }
-    
-                if (!updateResult) {
-                    throw new Error('Database update operation failed');
                 }
     
                 resolve(payload);
@@ -347,11 +349,7 @@ class Inventory {
                 } catch (error) {
                     throw new Error(`Error updating the database: ${error.message}`);
                 }
-    
-                if (!updateResult) {
-                    throw new Error('Database update operation failed');
-                }
-    
+
                 resolve(payload);
             } catch (error) {
                 reject(new Error(`${error.message}`));
@@ -429,11 +427,7 @@ class Inventory {
                 } catch (error) {
                     throw new Error(`Error updating the database: ${error.message}`);
                 }
-    
-                if (!updateResult) {
-                    throw new Error('Database update operation failed');
-                }
-    
+
                 resolve(items[0]);
             } catch (error) {
                 reject(new Error(`${error.message}`));

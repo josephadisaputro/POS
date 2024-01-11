@@ -1,0 +1,359 @@
+<style>
+    .card.body-menu .card.grouped{
+        width: fit-content;
+        box-shadow: none;
+    }
+    .card.body-menu .card.grouped label{
+        font-weight: bold;
+    }
+    .card.body-menu .card.grouped .small-info{
+        font-size: 1.5vh;
+        font-style: italic;
+    }
+    .card.body-menu .card.grouped .grouped-input{
+        display: flex;
+        flex-direction: row;
+        gap: 0.5vh;
+        margin-top: 1vh;
+    }
+    .card.body-menu .card.grouped .grouped-input.column{
+        display: flex;
+        flex-direction: column;
+        gap: 0.5vh;
+        margin-top: 1vh;
+    }
+    .card.body-menu .card.grouped select{
+        border-radius: 10px;
+        border: solid 1px #007AFF;
+        font-size: 2vh;
+        padding: 0.5vh;
+        background-color: white;
+        color: #007AFF;
+        text-align: center;
+    }
+    .card.body-menu .card.grouped select:focus{
+        border: solid 1px #007AFF;
+        outline: none;
+    }
+    .card.body-menu .card.grouped input{
+        border-radius: 10px;
+        border: solid 1px #007AFF;
+        font-size: 2vh;
+        padding: 0.5vh;
+        background-color: white;
+        color: #007AFF;
+        text-align: center;
+    }
+    .card.body-menu .card.grouped input:focus{
+        border: solid 1px #007AFF;
+        outline: none;
+    }
+    .card.body-menu .card.grouped input:read-only{
+        background-color: rgba(115, 148, 238, 0.3);
+    }
+    .card.body-menu .card.grouped button{
+        border-radius: 10px;
+        border: none;
+        padding: 1vh 2vh 1vh 2vh;
+        text-align: center;
+        cursor: pointer;
+        font-size: 2vh;
+        background-color: #007AFF;
+        color: white;
+        width: fit-content;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+    .card.body-menu .card.grouped .red-aware-button{
+        background-color: darkred;
+        color: white;
+    }
+</style>
+<div class="card grouped">
+    <label>Item SKU</label>
+    <div class="grouped-input">
+        <input id="item-sku-input" class="" type="text" placeholder="" />
+        <button class="" onclick="autoGenerate(this)">Auto-Generate</button>
+    </div>
+</div>
+<div class="card grouped">
+    <label>Item Name</label>
+    <div class="grouped-input">
+        <input id="item-name-input" class="" type="text" placeholder="" />
+    </div>
+</div>
+<div class="card grouped">
+    <label>Quantity</label>
+    <div class="grouped-input">
+        <input id="item-qty-input" class="" type="number" placeholder="" />
+    </div>
+    <label class="small-info">Please provide an non decimal number</label>
+</div>
+<div class="card grouped">
+    <label>Quantity Unit</label>
+    <div class="grouped-input">
+        <input id="item-unit-qty-input" class="" type="text" placeholder="pcs/kg/m" />
+    </div>
+    <label class="small-info">Please type in the unit of measurement used. For example: pcs/kg/m</label>
+</div>
+<div class="card grouped">
+    <label>Notes</label>
+    <div class="grouped-input">
+        <input id="item-notes-input" class="" type="text" placeholder="Write notes about your item, perhaps how delicate it is" />
+    </div>
+    <label class="small-info">Write notes about your item, perhaps how delicate it is</label>
+</div>
+<div class="card grouped">
+    <label>Sell Price</label>
+    <div class="grouped-input">
+        <input id="item-sell-price-input" class="" type="number" placeholder="100.000.000,00" />
+    </div>
+    <label class="small-info">Please enter sell price</label>
+</div>
+<div class="card grouped">
+    <label>Sell Price Currency</label>
+    <select id="item-sell-price-currency-input" name="">
+        <option value="IDR">IDR</option>
+        <option value="USD">USD</option>
+        <option value="CNY">CNY</option>
+        <option value="MYR">MYR</option>
+        <option value="SGD">SGD</option>
+        <option value="AUD">AUD</option>
+        <option value="EUR">EUR</option>
+        <option value="GBP">GBP</option>
+        <option value="HKD">HKD</option>
+    </select>
+</div>
+<div class="card grouped">
+    <label>Purchase Price</label>
+    <div class="grouped-input">
+        <input id="item-purchase-price-input" class="" type="number" placeholder="100.000.000,00" />
+    </div>
+    <label class="small-info">Please enter sell price</label>
+</div>
+<div class="card grouped">
+    <label>Purchase Price Currency</label>
+    <select id="item-purchase-price-currency-input" name="">
+        <option value="IDR">IDR</option>
+        <option value="USD">USD</option>
+        <option value="CNY">CNY</option>
+        <option value="MYR">MYR</option>
+        <option value="SGD">SGD</option>
+        <option value="AUD">AUD</option>
+        <option value="EUR">EUR</option>
+        <option value="GBP">GBP</option>
+        <option value="HKD">HKD</option>
+    </select>
+</div>
+<div class="card grouped">
+    <label>Storage Location Name</label>
+    <div class="grouped-input">
+        <input id="item-storage-location-name-input" class="" type="text" readonly/>
+    </div>
+    <label class="small-info">To change the storage location name, please go to the company profile menu and this edit value will be available</label>
+</div>
+<div class="card grouped">
+    <label>Storage Location Address</label>
+    <div class="grouped-input">
+        <input id="item-storage-location-address-input" class="" type="text" readonly/>
+    </div>
+    <label class="small-info">To change the storage location name, please go to the company profile menu and this edit value will be available</label>
+</div>
+<div class="card grouped">
+    <div class="grouped-input">
+        <button class="save-button" onclick="submitFormAbove('Create')">Submit</button>
+        <button class="edit-button" onclick="submitFormAbove('Edit')" hidden>Save Edit</button>
+        <button class="delete-button red-aware-button" onclick="submitFormAbove('Delete')" hidden>Delete Item</button>
+    </div>
+</div>
+
+<script>
+    checkPreActionRequest()
+    function checkPreActionRequest(){
+        if($(`#param1`).text() == "View"){
+            $(`#item-sku-input`).prop('disabled', true)
+            $(`#item-name-input`).prop('disabled', true)
+            $(`#item-qty-input`).prop('disabled', true)
+            $(`#item-unit-qty-input`).prop('disabled', true)
+            $(`#item-notes-input`).prop('disabled', true)
+            $(`#item-sell-price-input`).prop('disabled', true)
+            $(`#item-purchase-price-input`).prop('disabled', true)
+            $(`#item-sell-price-currency-input`).prop('disabled', true)
+            $(`#item-purchase-price-currency-input`).prop('disabled', true)
+            $(`#item-storage-location-name-input`).prop('disabled', true)
+            $(`#item-storage-location-address-input`).prop('disabled', true)
+            $(`.save-button`).hide()
+            const payload = {
+                "companyUUID": `${(new URLSearchParams(window.location.search).get("uuid"))}`,
+                "itemUUID": `${$(`#paramHelper1`).text()}`,
+                "itemSKU": `${$(`#paramHelper2`).text()}`,
+                "editorEmail": `${(new URLSearchParams(window.location.search).get("email"))}`
+            }
+            APIcall($(`#param1`).text().toLowerCase(), payload)
+        }else if($(`#param1`).text() == "Edit"){
+            $(`.edit-button`).show()
+            $(`.delete-button`).show()
+            $(`.save-button`).hide()
+
+            $(`#item-sku-input`).prop('disabled', true)
+            
+            const payload = {
+                "companyUUID": `${(new URLSearchParams(window.location.search).get("uuid"))}`,
+                "itemUUID": `${$(`#paramHelper1`).text()}`,
+                "itemSKU": `${$(`#paramHelper2`).text()}`,
+                "editorEmail": `${(new URLSearchParams(window.location.search).get("email"))}`
+            }
+            APIcall("view".toLowerCase(), payload)
+        }
+    }
+
+    function autoGenerate(element){
+        const randomeUUID = `${(new URLSearchParams(window.location.search).get("uuid"))}-item-` + generateUUID()
+        $(element).parent().find(`input:text`).val(randomeUUID)
+    }
+    function generateUUID() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = Math.random() * 16 | 0,
+                v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
+
+    function submitFormAbove(actionRequested){
+        if(actionRequested == 'Create'){
+            const payload = {
+                "companyUUID": `${(new URLSearchParams(window.location.search).get("uuid"))}`,
+                "itemSKU": `${$(`#item-sku-input`).val()}`,
+                "itemName": `${$(`#item-name-input`).val()}`,
+                "itemQty": 1 * $(`#item-qty-input`).val(),
+                "itemQtyUnit": `${$(`#item-unit-qty-input`).val()}`,
+                "itemNotes": `${$(`#item-notes-input`).val()}`,
+                "itemSellPrice": 1 * $(`#item-sell-price-input`).val(),
+                "itemPurchasePrice": 1 * $(`#item-purchase-price-input`).val(),
+                "itemCurrencySellPrice": `${$(`#item-sell-price-currency-input`).val()}`,
+                "itemCurrencyBuyPrice": `${$(`#item-purchase-price-currency-input`).val()}`,
+                "editorEmail": `${(new URLSearchParams(window.location.search).get("email"))}`,
+                "storageLocationName": `test`, // `${$(`#item-storage-location-name-input`).val()}`,
+                "storageLocationAddress": `test` //`${$(`#item-storage-location-address-input`).val()}`
+            }
+            console.log(payload)
+
+            APIcall(actionRequested.toLowerCase(), payload)
+        }else if(actionRequested == 'Delete'){
+            const payload = {
+                "companyUUID": `${(new URLSearchParams(window.location.search).get("uuid"))}`,
+                "itemSKU": `${$(`#item-sku-input`).val()}`,
+                "itemName": `${$(`#item-name-input`).val()}`,
+                "itemQty": 1 * $(`#item-qty-input`).val(),
+                "itemQtyUnit": `${$(`#item-unit-qty-input`).val()}`,
+                "itemNotes": `${$(`#item-notes-input`).val()}`,
+                "itemSellPrice": 1 * $(`#item-sell-price-input`).val(),
+                "itemPurchasePrice": 1 * $(`#item-purchase-price-input`).val(),
+                "itemCurrencySellPrice": `${$(`#item-sell-price-currency-input`).val()}`,
+                "itemCurrencyBuyPrice": `${$(`#item-purchase-price-currency-input`).val()}`,
+                "editorEmail": `${(new URLSearchParams(window.location.search).get("email"))}`,
+                "storageLocationName": `test`, // `${$(`#item-storage-location-name-input`).val()}`,
+                "storageLocationAddress": `test`, //`${$(`#item-storage-location-address-input`).val()}`
+                "itemUUID": `${$(`#paramHelper1`).text()}`
+            }
+            console.log(payload)
+
+            APIcall(actionRequested.toLowerCase(), payload)
+        }else if(actionRequested == 'Edit'){
+            const payload = {
+                "companyUUID": `${(new URLSearchParams(window.location.search).get("uuid"))}`,
+                "itemSKU": `${$(`#item-sku-input`).val()}`,
+                "itemName": `${$(`#item-name-input`).val()}`,
+                "itemQty": 1 * $(`#item-qty-input`).val(),
+                "itemQtyUnit": `${$(`#item-unit-qty-input`).val()}`,
+                "itemNotes": `${$(`#item-notes-input`).val()}`,
+                "itemSellPrice": 1 * $(`#item-sell-price-input`).val(),
+                "itemPurchasePrice": 1 * $(`#item-purchase-price-input`).val(),
+                "itemCurrencySellPrice": `${$(`#item-sell-price-currency-input`).val()}`,
+                "itemCurrencyBuyPrice": `${$(`#item-purchase-price-currency-input`).val()}`,
+                "editorEmail": `${(new URLSearchParams(window.location.search).get("email"))}`,
+                "storageLocationName": `test`, // `${$(`#item-storage-location-name-input`).val()}`,
+                "storageLocationAddress": `test`, //`${$(`#item-storage-location-address-input`).val()}`
+                "itemUUID": `${$(`#paramHelper1`).text()}`
+            }
+            console.log(payload)
+
+            APIcall(actionRequested.toLowerCase(), payload)
+        }
+    }
+
+    async function APIcall(action, payload){
+        let settings = {
+            "url": `${(new URL(window.location)).origin}/api/v1/item/${action}`,
+            "method": "POST",
+            "timeout": 0,
+            "headers": {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${(new URLSearchParams(window.location.search).get("pageToken"))}`
+            },
+            "data": JSON.stringify(payload),
+        };
+
+        await $.ajax(settings).done(async function (response) {
+            console.log(payload)
+            if(response.error){
+                $(`body`).append(`
+                    <style>
+                        .card.main-background{
+                            position: fixed;
+                            top: 0;
+                            left: 0;
+                            width: 100%;
+                            height: 100%;
+                            background-color: rgba(0, 0, 0, 0.7);
+                            gap: 1vh;
+                            border-radius: 0%;
+                        }
+                        .card.pop-up{
+                            width: 50%;
+                            position: fixed;
+                            left: calc(25%);
+                            top: calc(12.5%);
+                            background-color: #007AFF;
+                            color: white;
+                        }
+                        .card.title{
+                            background-color: #007AFF;
+                            color: white;
+                            font-size: 3vh;
+                        }
+                        .card.content-text{
+                            margin-top: 1vh;
+                            font-size: 2.5vh;
+                        }
+                    </style>
+                    <div class="card main-background" onclick="clearPopUp()">
+                    </div>
+                    <div class="card pop-up">
+                        <div class="card title">
+                            Warning Notification
+                        </div>
+                        <div class="card content-text">
+                            ${response.error}
+                        </div>
+                    </div>
+                `)
+            }else if(response.item){
+                $(`#item-sku-input`).val(response.item.itemSKU)
+                $(`#item-name-input`).val(response.item.itemName)
+                $(`#item-qty-input`).val(response.item.itemQty)
+                $(`#item-unit-qty-input`).val(response.item.itemQtyUnit)
+                $(`#item-notes-input`).val(response.item.itemNotes)
+                $(`#item-sell-price-input`).val(response.item.itemSellPrice)
+                $(`#item-purchase-price-input`).val(response.item.itemPurchasePrice)
+                $(`#item-sell-price-currency-input`).val(response.item.itemCurrencySellPrice)
+                $(`#item-purchase-price-currency-input`).val(response.item.itemCurrencyBuyPrice)
+                $(`#item-storage-location-name-input`).val(response.item.storageLocationName)
+                $(`#item-storage-location-address-input`).val(response.item.storageLocationAddress)
+            }
+        });
+    }
+
+</script>

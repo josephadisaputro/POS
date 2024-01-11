@@ -79,6 +79,10 @@
         justify-content: center;
         align-items: center;
         cursor: pointer;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
     }
     .card.menu-bar .card.menu-element.active{
         background-color: #007AFF;
@@ -121,12 +125,20 @@
         box-shadow: none;
         margin-left: 1vh;
         margin-right: 1vh;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
     }
     .card.active-menu .card.header-menu div{
         min-width: fit-content;
         justify-content: center;
         align-items: center;
         cursor: pointer;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
     }
     .card.active-menu .card.header-menu::-webkit-scrollbar {
         display: none;
@@ -415,11 +427,19 @@
         text-overflow: ellipsis;
         overflow: hidden;
         white-space: nowrap;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
     }
     .table .card.footer-table .text.blue{
         cursor: default;
         background-color: #007AFF;
         color: white;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
     }
     .table .card.body-table {
         background-color: #007AFF;
@@ -479,6 +499,11 @@
         padding-right: 1vh;
         background-color: #007AFF;
         color: white;
+        cursor: pointer;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
     }
 </style>
 <style>
@@ -556,6 +581,10 @@
         background-color: #007AFF;
         color: white;
         width: fit-content;
+        -moz-user-select: none;
+        -webkit-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
     }
     
 
@@ -772,9 +801,9 @@
             getMenuAPICall()
         });
 
-        function renderMenu(menu){
+        function renderMenu(element, menu){
             $(`.card.menu-element`).removeClass(`active`)
-            $(this).toggleClass(`active`)
+            $(element).toggleClass(`active`)
             renderMenuAPI(menu)
         }
 
@@ -789,14 +818,59 @@
             };
 
             await $.ajax(settings).done(async function (response) {
+                $(`.card.active-menu`).empty()
                 if(response){
-                    $(`.card.active-menu`).empty()
                     $(`.card.active-menu`).append(`
                         ${response}
                     `)
+                }else{
+                    $(`body`).append(`
+                        <style>
+                            .card.main-background{
+                                position: fixed;
+                                top: 0;
+                                left: 0;
+                                width: 100%;
+                                height: 100%;
+                                background-color: rgba(0, 0, 0, 0.7);
+                                gap: 1vh;
+                                border-radius: 0%;
+                            }
+                            .card.pop-up{
+                                width: 50%;
+                                position: fixed;
+                                left: calc(25%);
+                                top: calc(12.5%);
+                                background-color: #007AFF;
+                                color: white;
+                            }
+                            .card.title{
+                                background-color: #007AFF;
+                                color: white;
+                                font-size: 3vh;
+                            }
+                            .card.content-text{
+                                margin-top: 1vh;
+                                font-size: 2.5vh;
+                            }
+                        </style>
+                        <div class="card main-background" onclick="clearPopUp()">
+                        </div>
+                        <div class="card pop-up">
+                            <div class="card title">
+                                Warning Notification
+                            </div>
+                            <div class="card content-text">
+                                We apologize for the inconvenience but we are unable to render the menu you requested. Please try again later.
+                            </div>
+                        </div>
+                    `)
                 }
-                console.log(response)
             });
+        }
+
+        function clearPopUp() {
+            $('body').find('.card.main-background, .card.pop-up').remove();
         }
 
         async function getMenuAPICall(){
@@ -817,6 +891,35 @@
             await $.ajax(settings).done(async function (response) {
                 if(!response.menus){
                     $(`body`).append(`
+                        <style>
+                            .card.main-background{
+                                position: fixed;
+                                top: 0;
+                                left: 0;
+                                width: 100%;
+                                height: 100%;
+                                background-color: rgba(0, 0, 0, 0.7);
+                                gap: 1vh;
+                                border-radius: 0%;
+                            }
+                            .card.pop-up{
+                                width: 50%;
+                                position: fixed;
+                                left: calc(25%);
+                                top: calc(12.5%);
+                                background-color: #007AFF;
+                                color: white;
+                            }
+                            .card.title{
+                                background-color: #007AFF;
+                                color: white;
+                                font-size: 3vh;
+                            }
+                            .card.content-text{
+                                margin-top: 1vh;
+                                font-size: 2.5vh;
+                            }
+                        </style>
                         <div class="card main-background" onclick="clearPopUp()">
                         </div>
                         <div class="card pop-up">
@@ -832,134 +935,13 @@
                     $(`.card.menu-bar`).empty()
                     for(const eachMenu of response.menus){
                         $(`.card.menu-bar`).append(`
-                            <div id="company-profile-menu" class="card menu-element" onclick="renderMenu('${eachMenu.menu}')">
+                            <div id="company-profile-menu" class="card menu-element" onclick="renderMenu(this, '${eachMenu.menu}')">
                                 <div class="menu-title">${eachMenu.menuName}</div>
                             </div>
                         `)
                     }
                 }
             });
-        }
-
-        function renderCreateSalesOrderNonCashierMode(){
-            $(`.card.active-menu`).empty()
-            $(`.card.active-menu`).append(`
-                <div class="card header-menu">
-                    <div class="card title">Sales Order</div>
-                    <div class="card header-menu-element">Save and Process</div>
-                    <div onclick="renderSalesOrderMenuNonCashierMode()" class="card header-menu-element">Cancel</div>
-                </div>
-                <div class="card body-menu">
-                    <div class="card default-fill-in-the-blanks">
-                        <div class="card grouped">
-                            <label>Sales Order Number</label>
-                            <div class="grouped-input">
-                                <input id="" class="" type="text" placeholder="" />
-                                <button class="">Auto-Generate</button>
-                            </div>
-                        </div>
-                        <div class="card grouped">
-                            <label>Customer</label>
-                            <select id="" name="">
-                                <option value="customer-1">Customer 1</option>
-                                <option value="customer-2">Customer 2</option>
-                                <option value="customer-3">Customer 3</option>
-                                <option value="customer-4">Customer 4</option>
-                            </select>
-                        </div>
-                        <div class="card grouped">
-                            <label>Payment Method</label>
-                            <select id="" name="">
-                                <option value="payment-1">Payment Method 1</option>
-                                <option value="payment-2">Payment Method 2</option>
-                                <option value="payment-3">Payment Method 3</option>
-                                <option value="payment-4">Payment Method 4</option>
-                            </select>
-                            <div class="card hide-shadow">
-                                <label>Payment Method Notes</label>
-                                <div class="grouped-input">
-                                    <div id="" class="input-text-box" contenteditable="true"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card grouped">
-                            <label>Delivery Address</label>
-                            <div class="grouped-input">
-                                <input id="" class="" type="text" placeholder="" />
-                            </div>
-                        </div>
-                        <div class="card grouped">
-                            <label>Notes</label>
-                            <div class="grouped-input">
-                                <div id="" class="input-text-box" contenteditable="true"></div>
-                            </div>
-                        </div>
-                        <div class="card grouped">
-                            <label>Cart</label>
-                            <div class="grouped-input column">
-                                <button class="">Add Item</button>
-                                <div class="card receipt-card">
-                                    <div class="card grouped-header">
-                                        <div class="header">Name</div>
-                                        <div class="header">Qty</div>
-                                        <div class="header">Price</div>
-                                    </div>
-                                    <div class="grouped-body">
-                                        <div class="card grouped-sku-item" onclick="openPopUpDesktopMode(this)">
-                                            <div class="grouped-item-name-qty-price">
-                                                <div class="data product-name">Longest Item Name, I can possibly think of</div>
-                                                <div class="data product-qty">100</div>
-                                                <div class="data product-price">100,000,000.00</div>
-                                            </div>
-                                            <label class="item-sku-label product-sku">123456789123456789123456789123456789</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `)
-        }
-
-        function renderSalesOrderMenuNonCashierMode(){
-            $(`.card.active-menu`).empty()
-            $(`.card.active-menu`).append(`
-                <div class="card header-menu">
-                    <div onclick="renderCreateSalesOrderNonCashierMode()" class="card header-menu-element">Create New Sales Order</div>
-                    <div onclick="renderCashierMode()" class="card header-menu-element">Change View to Cashier Mode</div>
-                </div>
-                <div class="card body-menu">
-                    <div class="table">
-                        <div class="card header-table">
-                            <div class="text">Action Buttons</div>
-                            <div class="text">Header 2</div>
-                            <div class="text">Header 3</div>
-                            <div class="text">Created At</div>
-                            <div class="text">Status</div>
-                        </div>
-                        <div class="card body-table">
-                            <div class="card body-row-table">
-                                <div class="text action-buttons-group">
-                                    <div class="action-button">
-                                        Edit
-                                    </div>
-                                    <div class="action-button">
-                                        View
-                                    </div>
-                                    <div class="action-button">
-                                        Delete
-                                    </div>
-                                </div>
-                                <div class="text">A very long header on top very very long header, unimaginable</div>
-                                <div class="text">Body Row 3</div>
-                                <div class="text">Created at</div>
-                                <div class="text">Status</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `)
         }
 
         function renderCashierMode(){
