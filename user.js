@@ -314,6 +314,7 @@ class User{
             // Check if required keys exist and are not empty strings
             for (let key of requiredKeys) {
                 if (!payload[key] || typeof payload[key] !== 'string' || payload[key].trim() === '') {
+                    console.log(payload[key])
                     throw new Error(`Missing or invalid value for ${key}`);
                 }
             }
@@ -373,13 +374,17 @@ class User{
             }
             
             // Check if email is valid
-            if (!await this.validateEmailFormat(payload.email)) {
-                throw new Error(`Invalid email address`);
+            try{
+                await this.validateEmailFormat(payload.email)
+            }catch(e){
+                throw e
             }
             
             // Check if password is valid
-            if (!await this.validatePasswordFormat(payload.password)) {
-                throw new Error(`Invalid password format`);
+            try{
+                await this.validatePasswordFormat(payload.password)
+            }catch(e){
+                throw e
             }
             
             const findDuplicateEmail = await this.tempDatabaseObject.read(this.userFilename, -1, -1, "email", payload.email)
@@ -405,6 +410,8 @@ class User{
                 throw new Error(`Duplicate user found: email address`);
             }
         }catch(e){
+            console.log("===============================================")
+            console.log(e.message)
             throw e.message;
         }
     }    
@@ -489,7 +496,7 @@ class User{
             return true;
         } catch (error) {
             console.error(error.message);
-            return false;
+            throw error;
         }
     }
     
@@ -503,7 +510,7 @@ class User{
             return testResult;
         } catch (error) {
             console.error(error.message);
-            return false;
+            throw error;
         }
     }
     

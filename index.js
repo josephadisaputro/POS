@@ -196,7 +196,7 @@ app.post('/api/v1/company/delete', async function (req, res, next) {
     }
 })
 
-app.post('/api/v1/create/company', async function (req, res, next) {
+app.post('/api/v1/company/create', async function (req, res, next) {
     try{
         const authHeader = req.headers['authorization'];
         const token = authHeader && authHeader.split(' ')[1];
@@ -279,7 +279,7 @@ app.post('/api/v1/item/edit', async (req, res) => {
         const payload = req.body;
         const result = await inventoryObject.editExistingItem(token, payload);
         res.json({
-            item: result
+            itemUUID: result
         });
     } catch (error) {
         res.json({ error: error.message });

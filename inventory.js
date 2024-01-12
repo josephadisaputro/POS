@@ -15,8 +15,10 @@ class Inventory {
 
     async checkAccessValidity(companyUUID, editorEmail, action){
         try {
-            // Check if the user has the necessary permissions
-            const findCompanyUUID = await this.tempDatabaseObject.read(this.companyFilename + "-inventory", -1, -1, "uuid", companyUUID);
+            const findCompanyUUID = await this.tempDatabaseObject.read(this.companyFilename, -1, -1, "uuid", companyUUID);
+            if(findCompanyUUID.length <= 0){
+                throw new Error(`Company with uuid: ${companyUUID} not found`);
+            }
             const employees = JSON.parse(findCompanyUUID[0].employees);
             const findEmployee = employees.findIndex(obj => obj.email == editorEmail);
             if (findEmployee == -1) {
@@ -47,7 +49,11 @@ class Inventory {
             }
     
             // Check if the user has the necessary permissions
-            await this.checkAccessValidity(companyUUID, editorEmail, "View")
+            try{
+                await this.checkAccessValidity(companyUUID, editorEmail, "View")
+            }catch(e){
+                throw e
+            }
     
             // If sort is provided, it can only be 'asc' or 'desc'
             if (sort && sort !== 'asc' && sort !== 'desc') {
@@ -238,7 +244,7 @@ class Inventory {
 
                 for (const key in items[0]) {
                     if (!payload.hasOwnProperty(key)) {
-                        payload[key] = item[0].key
+                        payload[key] = items[0].key
                     }
                 }
 
@@ -266,8 +272,9 @@ class Inventory {
                     throw new Error(`Error updating the database: ${error.message}`);
                 }
     
-                resolve(payload);
+                resolve(payload.itemUUID);
             } catch (error) {
+                console.log(error)
                 reject(new Error(`${error.message}`));
             }
         });

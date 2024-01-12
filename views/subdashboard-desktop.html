@@ -49,16 +49,30 @@
     }
     .card.pop-up{
         width: 50%;
+        max-height: calc(100vh - 25%);
+        overflow: scroll;
         position: fixed;
         left: calc(25%);
         top: calc(12.5%);
         background-color: #007AFF;
         color: white;
     }
+    .card.pop-up::-webkit-scrollbar {
+        display: none;
+    }
+    .card.pop-up {
+        -ms-overflow-style: none;  /* IE and Edge */
+    }
     .card.title{
         background-color: #007AFF;
         color: white;
         font-size: 3vh;
+    }
+    .card.sub-title{
+        background-color: #007AFF;
+        color: white;
+        font-size: 2vh;
+        margin-top: 1vh;
     }
     .card.header{
         flex-direction: row;
@@ -148,7 +162,7 @@
 <body>
     <div class="card main">
         <div class="card header">
-            <div class="card option" onclick="renderCreateNewCompanyPopUp()">Create New Company Profile</div>
+            <div class="card option" onclick="renderCreateNewCompanyPopUp()">Create New Branch Profile</div>
         </div>
         <div class="card body">
             <diV class="card company" onclick="renderCreateNewCompanyPopUp()">
@@ -217,8 +231,8 @@
                         `)
                     }
                 }else{
+                    $(`.card.body`).empty()
                     for(const eachCompany of response.companies){
-                        $(`.card.body`).empty()
                         $(`.card.body`).append(`
                             <diV class="card company" onclick="RedirectToCompanyDashboard('${eachCompany.uuid}')">
                                 <div class="text">${eachCompany.companyName}</div>
@@ -244,7 +258,16 @@
                 </div>
                 <div class="card pop-up">
                     <div class="card title">
-                        Create New Company
+                        Create New Branch
+                    </div>
+                    <div class="card sub-title">
+                        If this is your first branch, you are required to enter your NPWP number.
+                        <br>
+                        <br>
+                        If this is not your first branch but you expect this new branch to have a different NPWP, then you need to enter a new NPWP number.
+                        <br>
+                        <br>
+                        If this is not your first branch but you expect the new branch to have the same NPWP, then there is no need to change the auto-filled NPWP number provided.
                     </div>
                     <div class="card form">
                         <div class="card input-group">
@@ -252,7 +275,7 @@
                             <input id="new-company-name" type="text"/>
                         </div>
                         <div class="card input-group">
-                            <label>Npwp Number</label>
+                            <label>NPWP Number</label>
                             <input id="new-company-npwp" type="text"/>
                         </div>
                         <div class="card input-group">
@@ -286,7 +309,7 @@
             let companyAddress2 = $("#new-company-address-2").val()
             let companyContact1 = $("#new-company-contact-number-1").val()
             let companyContact2= $("#new-company-contact-number-2").val()
-            await createNewCompanyProfile(companyNpwp, companyNpwp, companyAddress1, companyAddress2, companyContact1, companyContact2, token)
+            await createNewCompanyProfile(companyName, companyNpwp, companyAddress1, companyAddress2, companyContact1, companyContact2, (new URLSearchParams(window.location.search).get("pageToken")))
         }
 
         async function createNewCompanyProfile(companyName, npwp, companyAddress1, companyAddress2, companyContact1, companyContact2, token){
@@ -304,8 +327,8 @@
                     "npwp": `${npwp}`,
                     "companyAddress1": `${companyAddress1}`,
                     "companyAddress2": `${companyAddress2}`,
-                    "companyContact1": `${companyContact1}`,
-                    "companyContact2": `${companyContact2}`
+                    "companyContactNumber1": `${companyContact1}`,
+                    "companyContactNumber2": `${companyContact2}`
                 }),
             };
 
@@ -320,13 +343,29 @@
                                 Warning Notification
                             </div>
                             <div class="card content-text">
-                                We apologize for the inconvenience, but we are unable to create a new company at this time, please try again later. 
+                                We apologize for the inconvenience 
                                 <br>
                                 <br>
-                                Thank you for your time.
+                                ${response.error}
                             </div>
                         </div>
                     `)
+                }else{
+                    $(`body`).append(`
+                        <div class="card main-background" onclick="clearPopUp()">
+                        </div>
+                        <div class="card pop-up">
+                            <div class="card title">
+                                Success Notification
+                            </div>
+                            <div class="card content-text">
+                                A new branch has been added to your profile!
+                            </div>
+                        </div>
+                    `)
+                    setTimeout(() => {
+                        location.reload()
+                    }, 3000);
                 }
             });
         }

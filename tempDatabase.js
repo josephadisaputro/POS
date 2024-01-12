@@ -257,7 +257,7 @@ class tempDatabase {
     
                 let totalFilteredData = filteredDataCounts.reduce((a, b) => a + b, 0);
                 if (totalFilteredData < (page - 1) * size) {
-                    throw new Error("Not enough data to fulfill the request");
+                    return data;
                 }
     
                 let start = (page - 1) * size;
