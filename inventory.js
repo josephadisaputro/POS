@@ -16,7 +16,7 @@ class Inventory {
     async checkAccessValidity(companyUUID, editorEmail, action){
         try {
             // Check if the user has the necessary permissions
-            const findCompanyUUID = await this.tempDatabaseObject.read(this.companyFilename, -1, -1, "uuid", companyUUID);
+            const findCompanyUUID = await this.tempDatabaseObject.read(this.companyFilename + "-inventory", -1, -1, "uuid", companyUUID);
             const employees = JSON.parse(findCompanyUUID[0].employees);
             const findEmployee = employees.findIndex(obj => obj.email == editorEmail);
             if (findEmployee == -1) {
@@ -57,7 +57,7 @@ class Inventory {
             // Read the items from the database
             let items;
             try {
-                items = await this.tempDatabaseObject.read(companyUUID, page, size, null, null, sort, "isDeleted", false);
+                items = await this.tempDatabaseObject.read(companyUUID + "-inventory", page, size, null, null, sort, "isDeleted", false);
             } catch (error) {
                 throw new Error(`Error reading from database: ${error.message}`);
             }
@@ -85,7 +85,7 @@ class Inventory {
             // Read the item from the database
             let items;
             try {
-                items = await this.tempDatabaseObject.read(companyUUID, -1, -1, "itemUUID", itemUUID);
+                items = await this.tempDatabaseObject.read(companyUUID + "-inventory", -1, -1, "itemUUID", itemUUID);
             } catch (error) {
                 throw new Error(`Error reading from database: ${error.message}`);
             }
@@ -158,13 +158,12 @@ class Inventory {
                 payload.history = JSON.stringify([]);
                 payload.itemUUID = await this.tokenObject.getNewUUID();
                 payload.lastUpdated = new Date();
-
-                console.log(payload.itemUUID)
+                payload.action = "created-by-user";
     
                 // Check if item with same SKU exists
                 let items;
                 try {
-                    items = await this.tempDatabaseObject.read(payload.companyUUID, -1, -1, "itemSKU", payload.itemSKU);
+                    items = await this.tempDatabaseObject.read(payload.companyUUID + "-inventory", -1, -1, "itemSKU", payload.itemSKU);
                 } catch (error) {
                     throw new Error(`Error reading from database: ${error.message}`);
                 }
@@ -185,7 +184,7 @@ class Inventory {
                 // Write to database
                 let writeResult;
                 try {
-                    writeResult = await this.tempDatabaseObject.write(payload.companyUUID, payload);
+                    writeResult = await this.tempDatabaseObject.write(payload.companyUUID + "-inventory", payload);
                 } catch (error) {
                     throw new Error(`Error writing to database: ${error.message}`);
                 }
@@ -211,7 +210,7 @@ class Inventory {
                 // Check if item with same UUID exists and is not deleted
                 let items;
                 try {
-                    items = await this.tempDatabaseObject.read(payload.companyUUID, -1, -1, "itemUUID", payload.itemUUID);
+                    items = await this.tempDatabaseObject.read(payload.companyUUID + "-inventory", -1, -1, "itemUUID", payload.itemUUID);
                 } catch (error) {
                     throw new Error(`Error reading from database: ${error.message}`);
                 }
@@ -222,7 +221,7 @@ class Inventory {
                 // Check if item with same SKU exists and has the same UUID
                 let itemsWithSameSKU;
                 try {
-                    itemsWithSameSKU = await this.tempDatabaseObject.read(payload.companyUUID, -1, -1, "itemSKU", payload.itemSKU);
+                    itemsWithSameSKU = await this.tempDatabaseObject.read(payload.companyUUID + "-inventory", -1, -1, "itemSKU", payload.itemSKU);
                 } catch (error) {
                     throw new Error(`Error reading from database: ${error.message}`);
                 }
@@ -262,9 +261,7 @@ class Inventory {
                 // Update the item in the database
                 let updateResult;
                 try {
-                    console.log("___________________________ PAYLOAD UPDATE INVENTORY ___________________________")
-                    console.log(payload)
-                    updateResult = await this.tempDatabaseObject.update(payload.companyUUID, payload, "itemUUID", payload.itemUUID);
+                    updateResult = await this.tempDatabaseObject.update(payload.companyUUID + "-inventory", payload, "itemUUID", payload.itemUUID);
                 } catch (error) {
                     throw new Error(`Error updating the database: ${error.message}`);
                 }
@@ -301,7 +298,7 @@ class Inventory {
                 // Check if item with same UUID exists and is not deleted
                 let items;
                 try {
-                    items = await this.tempDatabaseObject.read(payload.companyUUID, -1, -1, "itemUUID", payload.itemUUID);
+                    items = await this.tempDatabaseObject.read(payload.companyUUID + "-inventory", -1, -1, "itemUUID", payload.itemUUID);
                 } catch (error) {
                     throw new Error(`Error reading from database: ${error.message}`);
                 }
@@ -312,7 +309,7 @@ class Inventory {
                 // Check if item with same SKU exists and has the same UUID
                 let itemsWithSameSKU;
                 try {
-                    itemsWithSameSKU = await this.tempDatabaseObject.read(payload.companyUUID, -1, -1, "itemSKU", payload.itemSKU);
+                    itemsWithSameSKU = await this.tempDatabaseObject.read(payload.companyUUID + "-inventory", -1, -1, "itemSKU", payload.itemSKU);
                 } catch (error) {
                     throw new Error(`Error reading from database: ${error.message}`);
                 }
@@ -328,7 +325,6 @@ class Inventory {
                 if (payload.history) {
                     let history = JSON.parse(payload.history);
                     items[0].lastUpdated = new Date();
-                    items[0].action = "edited-by-system";
                     history.push(items[0]);
                     payload.history = JSON.stringify(history);
                 }
@@ -336,6 +332,7 @@ class Inventory {
                 // Only allow itemQty to be updated, keep the rest of the keys from the existing item
                 payload = {
                     ...items[0],
+                    action: "edited-by-system",
                     itemQty: payload.itemQty,
                     lastUpdated: payload.lastUpdated,
                     editorEmail: payload.editorEmail,
@@ -345,7 +342,7 @@ class Inventory {
                 // Update the item in the database
                 let updateResult;
                 try {
-                    updateResult = await this.tempDatabaseObject.update(payload.companyUUID, payload, "itemUUID", payload.itemUUID);
+                    updateResult = await this.tempDatabaseObject.update(payload.companyUUID + "-inventory", payload, "itemUUID", payload.itemUUID);
                 } catch (error) {
                     throw new Error(`Error updating the database: ${error.message}`);
                 }
@@ -385,7 +382,7 @@ class Inventory {
                 // Check if item with same UUID exists and is not deleted
                 let items;
                 try {
-                    items = await this.tempDatabaseObject.read(payload.companyUUID, -1, -1, "itemUUID", payload.itemUUID);
+                    items = await this.tempDatabaseObject.read(payload.companyUUID + "-inventory", -1, -1, "itemUUID", payload.itemUUID);
                 } catch (error) {
                     throw new Error(`Error reading from database: ${error.message}`);
                 }
@@ -396,7 +393,7 @@ class Inventory {
                 // Check if item with same SKU exists and has the same UUID
                 let itemsWithSameSKU;
                 try {
-                    itemsWithSameSKU = await this.tempDatabaseObject.read(payload.companyUUID, -1, -1, "itemSKU", payload.itemSKU);
+                    itemsWithSameSKU = await this.tempDatabaseObject.read(payload.companyUUID + "-inventory", -1, -1, "itemSKU", payload.itemSKU);
                 } catch (error) {
                     throw new Error(`Error reading from database: ${error.message}`);
                 }
@@ -423,7 +420,7 @@ class Inventory {
                 // Update the item in the database
                 let updateResult;
                 try {
-                    updateResult = await this.tempDatabaseObject.update(payload.companyUUID, items[0], "itemUUID", payload.itemUUID);
+                    updateResult = await this.tempDatabaseObject.update(payload.companyUUID + "-inventory", items[0], "itemUUID", payload.itemUUID);
                 } catch (error) {
                     throw new Error(`Error updating the database: ${error.message}`);
                 }

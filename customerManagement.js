@@ -4,7 +4,7 @@ let tokenClass = require('./token.js')
 let uamClass = require('./uam.js')
 require('dotenv').config()
 
-class Inventory {
+class customerManagement {
     constructor(userObject) {
         this.companyFilename =  process.env.companyTable
         this.userObject = userObject
@@ -13,264 +13,25 @@ class Inventory {
         this.uamObject = new uamClass()
     }
 
-    async createNewCustomer(token, payload) {
+    async checkAccessValidity(companyUUID, editorEmail, action){
         try {
-            // Verify the token
-            await this.userObject.verifyToken(token);
-    
-            // Check if payload is an object
-            if (typeof payload !== 'object') {
-                throw new Error('Payload must be an object');
-            }
-    
-            // Check if payload has the required keys and their types
-            const requiredKeys = ['companyUUID', 'customerID', 'customerFullName', 'customerGender', 'customerDateOfBirth', 'customerMonthOfBirth', 'customerYearOfBirth', 'customerAddressLine1', 'customerAddressPostcode', 'customerContactNumber1', 'customerEmailAddress1', 'editorEmail'];
-            const validGenders = ["female", "male"];
-            for (const key of requiredKeys) {
-                if (!payload.hasOwnProperty(key)) {
-                    throw new Error(`Payload is missing key: ${key}`);
-                }
-                if (payload[key] === null || payload[key] === undefined) {
-                    throw new Error(`Key ${key} must have a value`);
-                }
-                if ((key === 'customerFullName' || key === 'customerAddressLine1' || key === 'customerEmailAddress1' || key === 'editorEmail') && typeof payload[key] !== 'string') {
-                    throw new Error(`Key ${key} must be a string`);
-                }
-                if ((key === 'customerDateOfBirth' || key === 'customerMonthOfBirth' || key === 'customerYearOfBirth') && !Number.isInteger(payload[key])) {
-                    throw new Error(`Key ${key} must be an integer`);
-                }
-                if (key === 'customerGender' && !validGenders.includes(payload[key])) {
-                    throw new Error(`Key ${key} must be one of the following genders: ${validGenders.join(', ')}`);
-                }
-                if (key === 'editorEmail' && !/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(payload[key])) {
-                    throw new Error(`Key ${key} must be a valid email address`);
-                }
-            }
-    
             // Check if the user has the necessary permissions
-            const findCompanyUUID = await this.tempDatabaseObject.read(this.companyFilename, -1, -1, "uuid", payload.companyUUID);
-            const employees = JSON.parse(findCompanyUUID[0].employees);
-            const findEmployee = employees.findIndex(obj => obj.email == payload.editorEmail);
-            if (findEmployee == -1) {
-                throw new Error('Not an employee');
-            } else {
-                if (!await this.uamObject.verifyAccess(employees[findEmployee].uam, "customerManagement", "Write")) {
-                    throw new Error('Access not granted');
-                }
-            }
-    
-            // Append additional keys to payload
-            payload.lastUpdated = new Date();
-            payload.isDeleted = false;
-            payload.history = JSON.stringify([]);
-    
-            // Write to database
-            let writeResult;
-            try {
-                writeResult = await this.tempDatabaseObject.write(payload.companyUUID, payload);
-            } catch (error) {
-                throw new Error(`Error writing to database: ${error.message}`);
-            }
-    
-            if (!writeResult) {
-                throw new Error('Database write operation failed');
-            }
-    
-            return payload;
-        } catch (error) {
-            console.error(error.message);
-        }
-    }    
-
-    async editExistingCustomer(token, payload) {
-        try {
-            // Verify the token
-            await this.userObject.verifyToken(token);
-    
-            // Check if payload is an object
-            if (typeof payload !== 'object') {
-                throw new Error('Payload must be an object');
-            }
-    
-            // Check if customer with same ID exists and is not deleted
-            let customers;
-            try {
-                customers = await this.tempDatabaseObject.read(payload.companyUUID, -1, -1, "customerID", payload.customerID);
-            } catch (error) {
-                throw new Error(`Error reading from database: ${error.message}`);
-            }
-            if (customers.length === 0 || customers[0].isDeleted === true) {
-                throw new Error('No customer found with the provided UUID or the customer is deleted');
-            }
-    
-            // Check if companyUUID in payload is the same as before
-            if (customers[0].companyUUID !== payload.companyUUID) {
-                throw new Error('companyUUID in payload is not the same as before');
-            }
-    
-            // Check if keys in payload are the same as existing customer
-            for (const key in payload) {
-                if (!customers[0].hasOwnProperty(key)) {
-                    throw new Error(`Key ${key} does not exist in the existing customer`);
-                }
-            }
-    
-            // Check if editorEmail is valid
-            if (payload.editorEmail && !/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(payload.editorEmail)) {
-                throw new Error(`editorEmail must be a valid email address`);
-            }
-    
-            // Check if the user has the necessary permissions
-            const findCompanyUUID = await this.tempDatabaseObject.read(this.companyFilename, -1, -1, "uuid", payload.companyUUID);
-            const employees = JSON.parse(findCompanyUUID[0].employees);
-            const findEmployee = employees.findIndex(obj => obj.email == payload.editorEmail);
-            if (findEmployee == -1) {
-                throw new Error('Not an employee');
-            } else {
-                if (!await this.uamObject.verifyAccess(employees[findEmployee].uam, "customerManagement", "Edit")) {
-                    throw new Error('Access not granted');
-                }
-            }
-    
-            // Update lastUpdated field
-            payload.lastUpdated = new Date();
-    
-            // Update history field
-            if (payload.history) {
-                let history = JSON.parse(payload.history);
-                customers[0].lastUpdated = new Date();
-                customers[0].action = "edited-by-user";
-                history.push(customers[0]);
-                payload.history = JSON.stringify(history);
-            }
-    
-            // Update the customer in the database
-            let updateResult;
-            try {
-                updateResult = await this.tempDatabaseObject.update(payload.companyUUID, payload, "customerID", payload.customerID);
-            } catch (error) {
-                throw new Error(`Error updating the database: ${error.message}`);
-            }
-    
-            return payload;
-        } catch (error) {
-            console.error(error.message);
-        }
-    }    
-    
-    async deleteCustomer(token, payload) {
-        try {
-            // Verify the token
-            await this.userObject.verifyToken(token);
-
-            // Check if payload is an object
-            if (typeof payload !== 'object') {
-                throw new Error('Payload must be an object');
-            }
-    
-            // Check if customer with same UUID exists and is not deleted
-            let customers;
-            try {
-                customers = await this.tempDatabaseObject.read(payload.companyUUID, -1, -1, "customerID", payload.customerID);
-            } catch (error) {
-                throw new Error(`Error reading from database: ${error.message}`);
-            }
-            if (customers.length === 0 || customers[0].isDeleted === true) {
-                throw new Error('No customer found with the provided UUID or the customer is deleted');
-            }
-
-            // Check if editorEmail is valid
-            if (payload.editorEmail && !/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(payload.editorEmail)) {
-                throw new Error(`editorEmail must be a valid email address`);
-            }
-
-            // Check if the user has the necessary permissions
-            const findCompanyUUID = await this.tempDatabaseObject.read(this.companyFilename, -1, -1, "uuid", payload.companyUUID);
-            const employees = JSON.parse(findCompanyUUID[0].employees);
-            const findEmployee = employees.findIndex(obj => obj.email == payload.editorEmail);
-            if (findEmployee == -1) {
-                throw new Error('Not an employee');
-            } else {
-                if (!await this.uamObject.verifyAccess(employees[findEmployee].uam, "customerManagement", "Delete")) {
-                    throw new Error('Access not granted');
-                }
-            }
-    
-            // Set isDeleted to true and keep the rest of the keys from the existing customer
-            customers[0].isDeleted = true;
-            customers[0].lastUpdated = new Date();
-            customers[0].editorEmail = payload.editorEmail;
-    
-            // Update history field
-            if (customers[0].history) {
-                let history = JSON.parse(customers[0].history);
-                customers[0].action = "deleted-by-user";
-                history.push(customers[0]);
-                customers[0].history = JSON.stringify(history);
-            }
-    
-            // Update the customer in the database
-            let updateResult;
-            try {
-                updateResult = await this.tempDatabaseObject.update(payload.companyUUID, customers[0], "customerID", payload.customerID);
-            } catch (error) {
-                throw new Error(`Error updating the database: ${error.message}`);
-            }
-    
-            return customers[0];
-        } catch (error) {
-            console.error(error.message);
-        }
-    }
-
-    async getCustomerDetail(token, editorEmail, companyUUID, customerID) {
-        try {
-            // Verify the token
-            await this.userObject.verifyToken(token);
-    
-            // Check if customerID is provided
-            if (!customerID) {
-                throw new Error('customerID must be provided');
-            }
-    
-            // Read the customer from the database
-            let customers;
-            try {
-                customers = await this.tempDatabaseObject.read(companyUUID, -1, -1, "customerID", customerID);
-            } catch (error) {
-                throw new Error(`Error reading from database: ${error.message}`);
-            }
-    
-            // Check if customer exists and is not deleted
-            if (customers.length === 0 || customers[0].isDeleted === true) {
-                throw new Error('No customer found with the provided UUID or the customer is deleted');
-            }
-    
-            // Check if the user has the necessary permissions
-            const findCompanyUUID = await this.tempDatabaseObject.read(this.companyFilename, -1, -1, "uuid", companyUUID);
+            const findCompanyUUID = await this.tempDatabaseObject.read(this.companyFilename + "-crm", -1, -1, "uuid", companyUUID);
             const employees = JSON.parse(findCompanyUUID[0].employees);
             const findEmployee = employees.findIndex(obj => obj.email == editorEmail);
             if (findEmployee == -1) {
                 throw new Error('Not an employee');
             } else {
-                if (!await this.uamObject.verifyAccess(employees[findEmployee].uam, "customerManagement", "View")) {
+                if (!await this.uamObject.verifyAccess(employees[findEmployee].uam, "customerManagement", action)) {
                     throw new Error('Access not granted');
                 }
             }
-    
-            // Parse the history field
-            if (customers[0].history) {
-                customers[0].history = JSON.parse(customers[0].history);
-            }
-    
-            // Return the customer details
-            return customers[0];
         } catch (error) {
-            console.error(error.message);
+            throw error;
         }
     }
 
-    async getCustomerList(token, editorEmail, companyUUID, page, size) {
+    async getCustomerList(token, companyUUID, editorEmail, page, size, sort = null) {
         try {
             // Verify the token
             await this.userObject.verifyToken(token);
@@ -286,36 +47,288 @@ class Inventory {
             }
     
             // Check if the user has the necessary permissions
-            const findCompanyUUID = await this.tempDatabaseObject.read(this.companyFilename, -1, -1, "uuid", companyUUID);
-            const employees = JSON.parse(findCompanyUUID[0].employees);
-            const findEmployee = employees.findIndex(obj => obj.email == editorEmail);
-            if (findEmployee == -1) {
-                throw new Error('Not an employee');
-            } else {
-                if (!await this.uamObject.verifyAccess(employees[findEmployee].uam, "customerManagement", "View")) {
-                    throw new Error('Access not granted');
-                }
+            await this.checkAccessValidity(companyUUID, editorEmail, "View")
+    
+            // If sort is provided, it can only be 'asc' or 'desc'
+            if (sort && sort !== 'asc' && sort !== 'desc') {
+                throw new Error('sort can only be asc or desc');
             }
     
             // Read the customers from the database
             let customers;
             try {
-                customers = await this.tempDatabaseObject.read(companyUUID, page, size, null, null);
+                customers = await this.tempDatabaseObject.read(companyUUID + "-crm", page, size, null, null, sort, "isDeleted", false);
             } catch (error) {
                 throw new Error(`Error reading from database: ${error.message}`);
             }
     
-            // Check if customers exist
-            if (customers.length === 0) {
-                throw new Error('No customers found');
+            // Return the customers
+            return items;
+        } catch (error) {
+            throw error.message;
+        }
+    }      
+
+    async getCustomerDetail(token, companyUUID, editorEmail, customerID, customerUUID) {
+        try {
+            await this.userObject.verifyToken(token);
+
+            if (!customerID || !customerUUID) {
+                throw new Error('Both customerID and customerUUID must be provided');
+            }
+
+            await this.checkAccessValidity(companyUUID, editorEmail, "View")
+    
+            let customers;
+            try {
+                customers = await this.tempDatabaseObject.read(companyUUID + "-crm", -1, -1, "customerUUID", customerUUID);
+            } catch (error) {
+                throw new Error(`Error reading from database: ${error.message}`);
             }
     
-            // Return the customers
-            return customers;
+            if (customers.length === 0 || customers[0].isDeleted === true) {
+                throw new Error('No customer found with the provided UUID or customer is deleted');
+            }
+    
+            if (customers[0].customerID !== customerID) {
+                throw new Error('The provided ID does not match the ID of the customer with the provided UUID');
+            }
+    
+            if (customers[0].history) {
+                customers[0].history = JSON.parse(customers[0].history);
+            }
+    
+            return customers[0];
         } catch (error) {
-            console.error(error.message);
+            throw error.message;
         }
+    }    
+
+    async validatePayload(payload) {
+        const requiredKeys = ['companyUUID', 'customerID', 'customerFullName', 'customerDateOfBirth', 'customerMonthOfBirth', 'customerYearOfBirth', 'customerOccupation', 'customerFlaggedStatus', 'customerAddress', 'customerPostcode', 'customerGender', 'customerContactNumber1', 'customerContactNumber2', 'customerEmailAddress1', 'customerEmailAddress2', 'editorEmail'];
+        const validGenders = ['Male', 'Female', 'Other'];
+        const validFlaggedStatus = ["New Customer", "Returning Customer", "Banned Customer", "VIP Customer"];
+    
+        for (let key of requiredKeys) {
+            if (!payload.hasOwnProperty(key)) {
+                if (key === 'customerOccupation' || key === 'customerContactNumber2' || key === 'customerEmailAddress2') {
+                    payload[key] = null;
+                } else {
+                    return `Missing required key: ${key}`;
+                }
+            }
+        }
+    
+        if (!validGenders.includes(payload['customerGender'])) {
+            return 'Invalid gender';
+        }
+    
+        if (!validFlaggedStatus.includes(payload['customerFlaggedStatus'])) {
+            return 'Invalid flagged status';
+        }
+    
+        const dob = payload['customerDateOfBirth'];
+        const mob = payload['customerMonthOfBirth'];
+        const yob = payload['customerYearOfBirth'];
+    
+        if (!Number.isInteger(dob) || dob < 1 || dob > 31) {
+            return 'Invalid date of birth';
+        }
+    
+        if (!Number.isInteger(mob) || mob < 1 || mob > 12) {
+            return 'Invalid month of birth';
+        }
+    
+        if (!Number.isInteger(yob) || yob < 1900) {
+            return 'Invalid year of birth';
+        }
+    
+        return 'Payload is valid';
     }
+    
+    async createNewCustomer(token, payload) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                await this.userObject.verifyToken(token);
+    
+                if (typeof payload !== 'object') {
+                    throw new Error('Payload must be an object');
+                }
+    
+                await this.validatePayload(payload)
+    
+                await this.checkAccessValidity(payload.companyUUID, payload.editorEmail, "Create")
+    
+                payload.isDeleted = false;
+                payload.history = JSON.stringify([]);
+                payload.customerUUID = await this.tokenObject.getNewUUID();
+                payload.createdDate = new Date();
+                payload.lastUpdated = new Date();
+                payload.action = "created-by-user";
+
+                let customers;
+                try {
+                    customers = await this.tempDatabaseObject.read(payload.companyUUID + "-crm", -1, -1, "customerID", payload.customerID);
+                } catch (error) {
+                    throw new Error(`Error reading from database: ${error.message}`);
+                }
+                if (customers.length > 0) {
+                    if (customers[0].isDeleted === false) {
+                        throw new Error('Duplicate customer ID found, please use a different customer ID');
+                    }
+                }
+
+                let writeResult;
+                try {
+                    writeResult = await this.tempDatabaseObject.write(payload.companyUUID + "-crm", payload);
+                } catch (error) {
+                    throw new Error(`Error writing to database: ${error.message}`);
+                }
+    
+                resolve(payload.customerID);
+            } catch (error) {
+                reject(error);
+            }
+        });
+    }    
+
+    async editExistingCustomer(token, payload) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                await this.userObject.verifyToken(token);
+
+                if (typeof payload !== 'object') {
+                    throw new Error('Payload must be an object');
+                }
+    
+                let customers;
+                try {
+                    customers = await this.tempDatabaseObject.read(payload.companyUUID + "-crm", -1, -1, "customerUUID", payload.customerUUID);
+                } catch (error) {
+                    throw new Error(`Error reading from database: ${error.message}`);
+                }
+                if (customers.length === 0 || customers[0].isDeleted === true) {
+                    throw new Error('No item found with the provided UUID or the customer is deleted');
+                }
+    
+                let customersWithTheSameID;
+                try {
+                    customersWithTheSameID = await this.tempDatabaseObject.read(payload.companyUUID + "-crm", -1, -1, "customerID", payload.customerID);
+                } catch (error) {
+                    throw new Error(`Error reading from database: ${error.message}`);
+                }
+                if (customersWithTheSameID.length > 0 && customersWithTheSameID[0].customerUUID !== payload.customerUUID) {
+                    throw new Error('There is a customer with the same customerID, but different UUID');
+                }
+    
+                for (const key in payload) {
+                    if (!customers[0].hasOwnProperty(key)) {
+                        throw new Error(`Key ${key} does not exist in the existing customer`)
+                    }
+                }
+
+                for (const key in customers[0]) {
+                    if (!payload.hasOwnProperty(key)) {
+                        payload[key] = customers[0].key
+                    }
+                }
+
+                await this.checkAccessValidity(payload.companyUUID, payload.editorEmail, "Edit")
+    
+                payload.lastUpdated = new Date();
+                payload.editorEmail = payload.editorEmail;
+    
+                let history = JSON.parse(customers[0].history);
+                customers[0].lastUpdated = new Date();
+                customers[0].action = "last-edited-by-user";
+                payload.action = "edited-by-user";
+                history.push(customers[0]);
+                payload.history = JSON.stringify(history);
+                payload.isDeleted = customers[0].isDeleted;
+    
+                let updateResult;
+                try {
+                    updateResult = await this.tempDatabaseObject.update(payload.companyUUID + "-crm", payload, "customerUUID", payload.customerUUID);
+                } catch (error) {
+                    throw new Error(`Error updating the database: ${error.message}`);
+                }
+    
+                resolve(payload);
+            } catch (error) {
+                reject(new Error(`${error.message}`));
+            }
+        });
+    }    
+    
+    async deleteCustomer(token, payload) {
+        return new Promise(async (resolve, reject) => {
+            try {
+                await this.userObject.verifyToken(token);
+
+                if (typeof payload !== 'object') {
+                    throw new Error('Payload must be an object');
+                }
+    
+                const requiredKeys = ['customerID', 'customerUUID', 'editorEmail'];
+                for (const key of requiredKeys) {
+                    if (!payload.hasOwnProperty(key)) {
+                        throw new Error(`Payload is missing key: ${key}`);
+                    }
+                    if (payload[key] === null || payload[key] === undefined) {
+                        throw new Error(`Key ${key} must have a value`);
+                    }
+                    if (key === 'editorEmail' && !/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(payload[key])) {
+                        throw new Error(`Key ${key} must be a valid email address`);
+                    }
+                }
+    
+                let customers;
+                try {
+                    customers = await this.tempDatabaseObject.read(payload.companyUUID + "-crm", -1, -1, "customerUUID", payload.customerUUID);
+                } catch (error) {
+                    throw new Error(`Error reading from database: ${error.message}`);
+                }
+                if (customers.length === 0 || customers[0].isDeleted === true) {
+                    throw new Error('No customer found with the provided UUID or the customer is already deleted');
+                }
+    
+                let customersWithSameID;
+                try {
+                    customersWithSameID = await this.tempDatabaseObject.read(payload.companyUUID + "-crm", -1, -1, "customerID", payload.customerID);
+                } catch (error) {
+                    throw new Error(`Error reading from database: ${error.message}`);
+                }
+                if (customersWithSameID.length > 0 && customersWithSameID[0].itemUUID !== payload.itemUUID) {
+                    throw new Error('There is a customer with the same ID, but different UUID');
+                }
+
+                await this.checkAccessValidity(payload.companyUUID, payload.editorEmail, "Edit")
+    
+                customers[0].isDeleted = true;
+                customers[0].lastUpdated = new Date();
+                customers[0].editorEmail = payload.editorEmail;
+    
+                if (customers[0].history) {
+                    let history = JSON.parse(customers[0].history);
+                    customers[0].action = "deleted-by-user";
+                    history.push(customers[0]);
+                    customers[0].history = JSON.stringify(history);
+                }
+    
+                let updateResult;
+                try {
+                    updateResult = await this.tempDatabaseObject.update(payload.companyUUID + "-crm", customers[0], "customerUUID", payload.customerUUID);
+                } catch (error) {
+                    throw new Error(`Error updating the database: ${error.message}`);
+                }
+
+                resolve(customers[0]);
+            } catch (error) {
+                reject(new Error(`${error.message}`));
+            }
+        });
+    }    
+    
 }
 
-module.exports = Inventory;
+module.exports = customerManagement;
