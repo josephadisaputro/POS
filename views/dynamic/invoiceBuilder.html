@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+    <meta name="description" content="">
+    <meta name="keywords" content="">
+    <meta name="author" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+</head>
+<style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        font-family: 'Roboto', sans-serif;
+    }
+    .card{
+        padding: 1vh;
+        border-radius: 10px;
+        border: none;
+        display: flex;
+        flex-direction: column;
+        flex-wrap: nowrap;
+        color: #007AFF;
+        background-color: white;
+        box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.19), 0px 6px 6px rgba(0, 0, 0, 0.23);
+        transition: 1s;
+    }
+    .card.header-invoice-builder{
+        position: absolute;
+        top: 1vh;
+        left: 1vh;
+        background-color: #007AFF;
+        color: white;
+        height: 5vh;
+        width: calc(100% - 4vh);
+        flex-direction: row;
+        flex-wrap: nowrap;
+        gap: 1vh;
+        overflow-x: scroll;
+    }
+    .card.header-invoice-builder::-webkit-scrollbar {
+        display: none;
+    }
+    .card.header-invoice-builder {
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+    }
+    .card.header-invoice-builder .card.tools-icon{
+        aspect-ratio: 1/1;
+        min-width: calc((100% - 5vh)/ 12);
+        max-width: calc((100% - 5vh)/ 12);
+        background-color: white;
+        color: #007AFF;
+        display: flex;
+        justify-content: center;align-items: center;
+        cursor: pointer;
+    }
+    .card.header-invoice-builder .card.tools-icon .icon-text{
+        width: 100%;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+        display: block;
+    }
+    .card.header-invoice-builder-hide-unhide-toggler{
+        position: absolute;
+        top: calc(5vh + 4vh);
+        left: 1vh;
+        font-size: 2vh;
+        width: calc(100% - 3vh);
+        justify-content: center;
+        align-items: center;
+        padding: 0.5vh;
+        cursor: pointer;
+    }
+    .card.body-invoice-builder-canvas{
+        position: absolute;
+        top: calc(5vh + 4vh + 4.5vh);
+        left: 1vh;
+        font-size: 2vh;
+        width: calc(100% - 3vh);
+        height: calc(100vh - (5vh + 4vh + 4.5vh + 2vh));
+        justify-content: center;
+        align-items: center;
+        padding: 0.5vh;
+        overflow-y: scroll;
+        background-color: whitesmoke;
+    }
+    .card.body-invoice-builder-canvas::-webkit-scrollbar {
+        display: none;
+    }
+    .card.body-invoice-builder-canvas {
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+    }
+    .card.body-invoice-builder-canvas .card.a4-canvas{
+        position: absolute;
+        top: 1cm;
+        width: 21cm;
+        min-height: 29.7cm;
+        padding: 2cm;
+        margin: 1cm auto;
+        border: 1px #D3D3D3 solid;
+        border-radius: 5px;
+        background: white;
+        color: black;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+</style>
+<style>
+    .editableContent {
+        position: absolute;
+        z-index: 9;
+        background-color: transparent;
+        color: black;
+    }
+
+    .editableContentheader {
+        padding: 0.5vh;
+        cursor: pointer;
+        z-index: 10;
+        background-color: white;
+        color: #007AFF;
+        box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.19), 0px 6px 6px rgba(0, 0, 0, 0.23);
+        text-align: center;
+        border-radius: 10px;
+        margin-bottom: 1vh;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        gap: 1vh;
+        visibility: hidden;
+    }
+    .editableContentheader .draggableicon{
+        cursor: move;
+    }
+    .editableContentheader img{
+        width: calc(5vh);
+        height: calc(5vh);
+        border-radius: 10px;
+    }
+    .editableContentheader span{
+        text-align: center;
+        justify-content: center;
+        align-items: center;
+        display: flex;
+        margin-right: 2vh;
+    }
+    .editableContentheader .fontSizeEditorForEditableContentBody{
+        width: calc(5vh);
+        height: calc(5vh);
+        border-radius: 10px;
+        border: 1px solid #007AFF;
+        text-align: center;
+        font-size: 3vh;
+    }
+    .editableContentBody{
+        width: 20vh;
+        height: 20vh;
+        border: 1px solid #d3d3d3;
+        border-radius: 10px;
+        padding: 0.5vh;
+        font-size: 24px;
+    }
+    .editableContentBody:focus{
+        outline: none;
+        border-right: solid #007AFF 3px;
+        border-bottom: solid #007AFF 3px;
+        border-radius: 10px 0 0 0;
+    }
+    .noselect {
+        -webkit-touch-callout: none; /* iOS Safari */
+        -webkit-user-select: none; /* Safari */
+        -khtml-user-select: none; /* Konqueror HTML */
+        -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+        user-select: none; /* Non-prefixed version, currently supported by Chrome, Opera and Firefox */
+    }
+
+</style>
+<body>
+    <div class="card header-invoice-builder">
+        <div class="card tools-icon noselect" onclick="addNewBoxToBodyCanvas()">
+            <div class="icon-text">
+                Text Box
+            </div>
+        </div>
+        <div class="card tools-icon noselect" onclick="exportToPDF()">
+            <div class="icon-text">
+                Export to PDF
+            </div>
+        </div>
+    </div>
+    <div class="card header-invoice-builder-hide-unhide-toggler noselect">
+        Hide
+    </div>
+    <div class="card body-invoice-builder-canvas" >
+        <div class="card a4-canvas">
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js" integrity="sha384-NaWTHo/8YCBYJ59830LTz/P4aQZK1sS0SneOgAvhsIl3zBu8r9RevNg5lHCHAuQ/" crossorigin="anonymous"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+    <script>
+        function addNewBoxToBodyCanvas(){
+            const id = generateUUID() + "" + generateUUID()
+            $(`.card.body-invoice-builder-canvas .card.a4-canvas`).append(`
+                <div class="noselect editableContent" id="${id}">
+                    <div id="${id}header" class="editableContentheader" onclick="dragElement(document.getElementById('${id}'));">
+                        <img id="${id}draggable" class="draggableicon" src="../../db/permanent/assets/icon/draggable_icon.png"/>
+                        <img onclick="setToBold('${id}editableContentBody')" src="../../db/permanent/assets/icon/bold_icon.png"/>
+                        <img onclick="setToItalic('${id}editableContentBody')" src="../../db/permanent/assets/icon/italic_icon.png"/>
+                        <img onclick="setTextToAlignLeft('${id}editableContentBody')" src="../../db/permanent/assets/icon/align_text_left_icon.png"/>
+                        <img onclick="setTextToAlignMiddle('${id}editableContentBody')" src="../../db/permanent/assets/icon/align_text_center_icon.png"/>
+                        <img onclick="setTextToAlignRight('${id}editableContentBody')" src="../../db/permanent/assets/icon/align_text_right_icon.png"/>
+                        <input class="fontSizeEditorForEditableContentBody" onchange="setFontSizeForEditableContentBody('${id}editableContentBody', this)" type="text" value="24">
+                        <span>px</span>
+                        <img onclick="deleteCustom('${id}')" src="../../db/permanent/assets/icon/bin_icon.png"/>
+                    </div>
+                    <div id="${id}editableContentBody" class="editableContentBody" contenteditable="true" onclick="toggleFin('${id}header')">Move</div>
+                </div>
+            `)
+
+            $("#" + id + "editableContentBody").resizable({
+                handles: 'e, s'
+            });
+
+
+        }
+
+        function exportToPDF() {
+            var element = document.querySelector('.card.body-invoice-builder-canvas .card.a4-canvas'); // Select the element
+
+            html2canvas(element).then(function(canvas) {
+                var imgData = canvas.toDataURL('image/png');
+                var doc = new jsPDF('p', 'mm', 'a4');
+                var width = doc.internal.pageSize.getWidth();
+                var height = doc.internal.pageSize.getHeight();
+                doc.addImage(imgData, 'PNG', 0, 0, width, height);
+                doc.save('invoice.pdf');
+            });
+        }
+
+        function deleteCustom(id){
+            $(`#${id}`).remove()
+        }
+
+        function setFontSizeForEditableContentBody(id, element){
+            $(`#${id}`).css(`font-size`,`${$(element).val()}px`)
+        }
+
+        function setToBold(id){
+            $(`#${id}`).css(`font-weight`, `bold`)
+        }
+
+        function setToItalic(id){
+            $(`#${id}`).css(`font-style`, `italic`)
+        }
+
+        function setTextToAlignLeft(id){
+            $(`#${id}`).css(`text-align`,`left`)
+        }
+
+        function setTextToAlignMiddle(id){
+            $(`#${id}`).css(`text-align`,`center`)
+        }
+
+        function setTextToAlignRight(id){
+            $(`#${id}`).css(`text-align`,`right`)
+        }
+
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0,
+                    v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+        function toggleFin(elmntId){
+            if($(`#${elmntId}`).css("visibility") == "hidden"){
+                $(`#${elmntId}`).css("visibility","visible")
+            }else{
+                $(`#${elmntId}`).css("visibility","hidden")
+            }
+        }
+        function dragElement(elmnt) {
+            var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            if (document.getElementById(elmnt.id + "draggable")) {
+                /* if present, the header is where you move the DIV from:*/
+                document.getElementById(elmnt.id + "draggable").onmousedown = dragMouseDown;
+            } else {
+                /* otherwise, move the DIV from anywhere inside the DIV:*/
+                elmnt.onmousedown = dragMouseDown;
+            }
+
+            function dragMouseDown(e) {
+                e = e || window.event;
+                e.preventDefault();
+                // get the mouse cursor position at startup:
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                // call a function whenever the cursor moves:
+                document.onmousemove = elementDrag;
+            }
+
+            function elementDrag(e) {
+                e = e || window.event;
+                e.preventDefault();
+                // calculate the new cursor position:
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                // set the element's new position:
+                elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+                elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+            }
+
+            function closeDragElement() {
+                /* stop moving when mouse button is released:*/
+                document.onmouseup = null;
+                document.onmousemove = null;
+            }
+        }
+    </script>
+</body>
+</html>
