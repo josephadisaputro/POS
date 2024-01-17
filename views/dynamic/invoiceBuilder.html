@@ -56,21 +56,37 @@
         scrollbar-width: none;  /* Firefox */
     }
     .card.header-invoice-builder .card.tools-icon{
-        aspect-ratio: 1/1;
-        min-width: calc((100% - 5vh)/ 12);
-        max-width: calc((100% - 5vh)/ 12);
+        gap: 0.5vh;
         background-color: white;
         color: #007AFF;
         display: flex;
         justify-content: center;align-items: center;
         cursor: pointer;
+        flex-direction: row;
     }
     .card.header-invoice-builder .card.tools-icon .icon-text{
-        width: 100%;
-        text-overflow: ellipsis;
-        overflow: hidden;
-        white-space: nowrap;
-        display: block;
+        width: fit-content;
+    }
+    .card.header-invoice-builder .card.tools-icon .icon-text.background-color-blue{
+        padding: 0.5vh;
+        border-radius: 10px;
+        background-color: #007AFF;
+        color: white;
+    }
+    .card.header-invoice-builder .card.tools-icon .tools-icon-parameter-help-group{
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        background-color: transparent;
+        color: #007AFF;
+        justify-content: center;
+        align-items: center;
+    }
+    .card.header-invoice-builder .card.tools-icon .tools-icon-parameter-help-group input{
+        border-radius: 10px;
+        border: solid #007AFF;
+        text-align: center;
+        width: 24px;
     }
     .card.header-invoice-builder-hide-unhide-toggler{
         position: absolute;
@@ -108,6 +124,7 @@
         top: 1cm;
         width: 21cm;
         min-height: 29.7cm;
+        max-height: 29.7cm;
         padding: 2cm;
         margin: 1cm auto;
         border: 1px #D3D3D3 solid;
@@ -115,39 +132,28 @@
         background: white;
         color: black;
         box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
+        display: flex;
+        flex-direction: row;
+        align-content:baseline;
+        flex-wrap: wrap;
+        gap: 0;
     }
 </style>
 <style>
-    .editableContent {
-        position: absolute;
-        z-index: 9;
-        background-color: transparent;
-        color: black;
-    }
-
     .editableContentheader {
-        padding: 0.5vh;
-        cursor: pointer;
-        z-index: 10;
         background-color: white;
         color: #007AFF;
-        box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.19), 0px 6px 6px rgba(0, 0, 0, 0.23);
-        text-align: center;
         border-radius: 10px;
-        margin-bottom: 1vh;
         display: flex;
         flex-direction: row;
         flex-wrap: nowrap;
         gap: 1vh;
-        visibility: hidden;
-    }
-    .editableContentheader .draggableicon{
-        cursor: move;
+        justify-content: center;
+        align-items: center;
     }
     .editableContentheader img{
-        width: calc(5vh);
-        height: calc(5vh);
+        width: calc(4vh);
+        height: calc(4vh);
         border-radius: 10px;
     }
     .editableContentheader span{
@@ -175,8 +181,8 @@
     }
     .editableContentBody:focus{
         outline: none;
-        border-right: solid #007AFF 3px;
-        border-bottom: solid #007AFF 3px;
+        border-right: solid #007AFF 1px;
+        border-bottom: solid #007AFF 1px;
         border-radius: 10px 0 0 0;
     }
     .noselect {
@@ -187,6 +193,24 @@
         -ms-user-select: none; /* Internet Explorer/Edge */
         user-select: none; /* Non-prefixed version, currently supported by Chrome, Opera and Firefox */
     }
+    table{
+        width: 100%;
+        border: solid 1px #d3d3d3;
+        border-radius: 10px;
+    }
+    table:focus{
+        outline: #007AFF;
+        border: solid 1px #007AFF;
+    }
+    td, th:focus{
+        outline: #007AFF;
+        border: solid 1px #007AFF;
+    }
+    td, th{
+        border: solid 1px #d3d3d3;
+        border-radius: 10px;
+    }
+
 
 </style>
 <body>
@@ -196,9 +220,44 @@
                 Text Box
             </div>
         </div>
+        <div class="card tools-icon noselect" onclick="addNewFreeFlowBoxToBodyCanvas()">
+            <div class="icon-text">
+                Free-flow Text Box
+            </div>
+        </div>
+        <div class="card tools-icon noselect">
+            <div class="icon-text background-color-blue" onclick="insertNewTable('number-of-columns-requested-to-make', 'number-of-rows-requested-to-make')">
+                Insert Table
+            </div>
+            <div class="tools-icon-parameter-help-group">
+                <div>Columns:</div>
+                <input id="number-of-columns-requested-to-make" value="3" type="text"/>
+            </div>
+            <div class="tools-icon-parameter-help-group">
+                <div>Rows:</div>
+                <input id="number-of-rows-requested-to-make" value="3" type="text"/>
+            </div>
+        </div>
+        <div class="card tools-icon noselect">
+            <div class="editableContentheader">
+                <img onclick="setToBold()" src="../../db/permanent/assets/icon/bold_icon.png"/>
+                <img onclick="setToItalic()" src="../../db/permanent/assets/icon/italic_icon.png"/>
+                <img onclick="setTextToAlignLeft()" src="../../db/permanent/assets/icon/align_text_left_icon.png"/>
+                <img onclick="setTextToAlignMiddle()" src="../../db/permanent/assets/icon/align_text_center_icon.png"/>
+                <img onclick="setTextToAlignRight()" src="../../db/permanent/assets/icon/align_text_right_icon.png"/>
+                <input class="fontSizeEditorForEditableContentBody" onchange="setFontSizeForEditableContentBody(this)" type="text" value="24">
+                <span>px</span>
+                <img onclick="deleteCustom()" src="../../db/permanent/assets/icon/bin_icon.png"/>
+            </div>
+        </div>
         <div class="card tools-icon noselect" onclick="exportToPDF()">
             <div class="icon-text">
                 Export to PDF
+            </div>
+        </div>
+        <div class="card tools-icon noselect" onclick="exportToDocX('document.doc', 'a4-canvas')">
+            <div class="icon-text">
+                Export to docx
             </div>
         </div>
     </div>
@@ -206,38 +265,81 @@
         Hide
     </div>
     <div class="card body-invoice-builder-canvas" >
-        <div class="card a4-canvas">
+        <div id="a4-canvas" class="card a4-canvas">
         </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js" integrity="sha384-NaWTHo/8YCBYJ59830LTz/P4aQZK1sS0SneOgAvhsIl3zBu8r9RevNg5lHCHAuQ/" crossorigin="anonymous"></script>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.js" integrity="sha512-uIyr8ZckIja9VOPUeXkjwY73IQM1aEstGRPhywDSDJa6+Jp+lhMxv3snBNz9ZJQx5R3OELgwNv62LyW2Rh0XFA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <script>
         function addNewBoxToBodyCanvas(){
+            const maxWidth = $(`.card.body-invoice-builder-canvas .card.a4-canvas`).width()
+            const maxHeight = $(`.card.body-invoice-builder-canvas .card.a4-canvas`).height()
+            let totalWidth = 0
+            let totalHeight = 0
+            let maxHeightInRow = 0
+            $(`.card.body-invoice-builder-canvas .card.a4-canvas`).children().each(function() {
+                if(maxHeightInRow < $(this).height()){
+                    maxHeightInRow = $(this).height()
+                }
+                totalWidth += $(this).width();
+                if(totalWidth >= maxWidth){
+                    totalHeight += maxHeightInRow
+                    maxHeightInRow = $(this).height()
+                    totalWidth = 0
+                }
+            });
             const id = generateUUID() + "" + generateUUID()
+            const newElement = $(`
+                <div id="${id}editableContentBody" class="editableContentBody" contenteditable="true" style="position: relative; top: 0; left: 0; width: calc((100% - 4px - 2vh) / 2)">Move</div>
+            `)
+
+            if(totalHeight + $(newElement).height() > maxHeight){
+                    // new page
+                    console.log(totalHeight, maxHeight)
+                }
+
+
+
+            
             $(`.card.body-invoice-builder-canvas .card.a4-canvas`).append(`
-                <div class="noselect editableContent" id="${id}">
-                    <div id="${id}header" class="editableContentheader" onclick="dragElement(document.getElementById('${id}'));">
-                        <img id="${id}draggable" class="draggableicon" src="../../db/permanent/assets/icon/draggable_icon.png"/>
-                        <img onclick="setToBold('${id}editableContentBody')" src="../../db/permanent/assets/icon/bold_icon.png"/>
-                        <img onclick="setToItalic('${id}editableContentBody')" src="../../db/permanent/assets/icon/italic_icon.png"/>
-                        <img onclick="setTextToAlignLeft('${id}editableContentBody')" src="../../db/permanent/assets/icon/align_text_left_icon.png"/>
-                        <img onclick="setTextToAlignMiddle('${id}editableContentBody')" src="../../db/permanent/assets/icon/align_text_center_icon.png"/>
-                        <img onclick="setTextToAlignRight('${id}editableContentBody')" src="../../db/permanent/assets/icon/align_text_right_icon.png"/>
-                        <input class="fontSizeEditorForEditableContentBody" onchange="setFontSizeForEditableContentBody('${id}editableContentBody', this)" type="text" value="24">
-                        <span>px</span>
-                        <img onclick="deleteCustom('${id}')" src="../../db/permanent/assets/icon/bin_icon.png"/>
-                    </div>
-                    <div id="${id}editableContentBody" class="editableContentBody" contenteditable="true" onclick="toggleFin('${id}header')">Move</div>
-                </div>
+                <div id="${id}editableContentBody" class="editableContentBody" contenteditable="true" style="position: relative; top: 0; left: 0; width: calc((100% - 4px - 2vh) / 2)">Move</div>
             `)
 
             $("#" + id + "editableContentBody").resizable({
                 handles: 'e, s'
-            });
+            })
+        }
 
+        function addNewFreeFlowBoxToBodyCanvas(){
+            const id = generateUUID() + "" + generateUUID()
+            $(`.card.body-invoice-builder-canvas .card.a4-canvas`).append(`
+                <div id="${id}editableContentBody" class="editableContentBody" contenteditable="true">Move</div>
+            `)
 
+            $("#" + id + "editableContentBody").resizable({
+                handles: 'e, s'
+            })
+
+            $("#" + id + "editableContentBody").draggable({
+                // other options...
+                drag: function(event, ui) {
+                    dragPosition = ui.position;
+                    if(dragPosition.top < 0 && dragPosition.left < 0){
+                        dragPosition.top = 0
+                        dragPosition.left = 0
+                    }else if(dragPosition.top < 0){
+                        dragPosition.top = 0
+                    }else if(dragPosition.left < 0){
+                        dragPosition.left = 0
+                    }
+                    $(this).css(`position`, `absolute`)
+                    $(this).css(`top`, dragPosition.top)
+                    $(this).css(`left`, dragPosition.left)
+                }
+            })
         }
 
         function exportToPDF() {
@@ -253,32 +355,137 @@
             });
         }
 
+        function exportToDocX(filename = 'document.doc', elId) {
+            var elHtml = document.getElementById(elId).innerHTML;
+            var link = document.createElement('a');
+            link.setAttribute('download', filename);
+            link.setAttribute('href', 'data:' + 'text/doc' + ';charset=utf-8,' + encodeURIComponent(elHtml));
+            link.click();
+
+        }
+
         function deleteCustom(id){
-            $(`#${id}`).remove()
+            var element = null;
+            if (window.getSelection) {
+                element = $(window.getSelection().anchorNode).parent();
+            } else if (document.selection) {
+                element = $(document.selection.createRange().parentElement());
+            }
+            if(element){
+                if (element.parents('div.card.a4-canvas').length) {
+                    $(element).remove()
+                }
+            }
         }
 
         function setFontSizeForEditableContentBody(id, element){
-            $(`#${id}`).css(`font-size`,`${$(element).val()}px`)
+            var element = null;
+            if (window.getSelection) {
+                element = $(window.getSelection().anchorNode).parent();
+            } else if (document.selection) {
+                element = $(document.selection.createRange().parentElement());
+            }
+            if(element){
+                $(element).css(`font-size`,`${$(element).val()}px`)
+            }
         }
 
-        function setToBold(id){
-            $(`#${id}`).css(`font-weight`, `bold`)
+        function setToBold(){
+            var element = null;
+            if (window.getSelection) {
+                element = $(window.getSelection().anchorNode).parent();
+            } else if (document.selection) {
+                element = $(document.selection.createRange().parentElement());
+            }
+            if(element){
+                if($(element).css(`font-weight`) > `400`){
+                    $(element).css(`font-weight`, `unset`)
+                }else{
+                    $(element).css(`font-weight`, `bold`)
+                }
+            }
         }
 
-        function setToItalic(id){
-            $(`#${id}`).css(`font-style`, `italic`)
+        function setToItalic(){
+            var element = null;
+            if (window.getSelection) {
+                element = $(window.getSelection().anchorNode).parent();
+            } else if (document.selection) {
+                element = $(document.selection.createRange().parentElement());
+            }
+            if(element){
+                if($(element).css(`font-style`) == `italic`){
+                    $(element).css(`font-style`, `unset`)
+                }else{
+                    $(element).css(`font-style`, `italic`)
+                }
+            }
         }
 
-        function setTextToAlignLeft(id){
-            $(`#${id}`).css(`text-align`,`left`)
+        function setTextToAlignLeft(){
+            var element = null;
+            if (window.getSelection) {
+                element = $(window.getSelection().anchorNode).parent();
+            } else if (document.selection) {
+                element = $(document.selection.createRange().parentElement());
+            }
+            if(element){
+                $(element).css(`text-align`,`left`)
+            }
         }
 
-        function setTextToAlignMiddle(id){
-            $(`#${id}`).css(`text-align`,`center`)
+        function setTextToAlignMiddle(){
+            var element = null;
+            if (window.getSelection) {
+                element = $(window.getSelection().anchorNode).parent();
+            } else if (document.selection) {
+                element = $(document.selection.createRange().parentElement());
+            }
+            if(element){
+                $(element).css(`text-align`,`center`)
+            }
         }
 
-        function setTextToAlignRight(id){
-            $(`#${id}`).css(`text-align`,`right`)
+        function setTextToAlignRight(){
+            var element = null;
+            if (window.getSelection) {
+                element = $(window.getSelection().anchorNode).parent();
+            } else if (document.selection) {
+                element = $(document.selection.createRange().parentElement());
+            }
+            if(element){
+                $(element).css(`text-align`,`right`)
+            }
+        }
+
+        function insertNewTable(idColumn, idRow){
+            let columns = parseInt($(`#${idColumn}`).val())
+            let rows = parseInt($(`#${idRow}`).val())
+            console.log(columns, rows)
+            const id = generateUUID() + "" + generateUUID()
+            $(`.card.a4-canvas`).append(`
+                <table id="${id}" contenteditable="true">
+                </table>
+            `)
+            let tableContent = '';
+            for(let i = 0; i < rows; i ++){
+                tableContent = tableContent + '<tr>'
+                for(let i = 0; i < columns; i ++){
+                    tableContent = tableContent + `<td id="${id}row">Doe</td>`
+                }
+                tableContent = tableContent + '</tr>'
+            }
+            $(`#${id}`).append(`
+                ${tableContent}
+            `)
+
+            $("#" + id).resizable({
+                handles: 'e, s'
+            })
+
+            $("#" + id + "row").resizable({
+                handles: 'e, s'
+            })
         }
 
         function generateUUID() {
@@ -287,53 +494,6 @@
                     v = c === 'x' ? r : (r & 0x3 | 0x8);
                 return v.toString(16);
             });
-        }
-        function toggleFin(elmntId){
-            if($(`#${elmntId}`).css("visibility") == "hidden"){
-                $(`#${elmntId}`).css("visibility","visible")
-            }else{
-                $(`#${elmntId}`).css("visibility","hidden")
-            }
-        }
-        function dragElement(elmnt) {
-            var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-            if (document.getElementById(elmnt.id + "draggable")) {
-                /* if present, the header is where you move the DIV from:*/
-                document.getElementById(elmnt.id + "draggable").onmousedown = dragMouseDown;
-            } else {
-                /* otherwise, move the DIV from anywhere inside the DIV:*/
-                elmnt.onmousedown = dragMouseDown;
-            }
-
-            function dragMouseDown(e) {
-                e = e || window.event;
-                e.preventDefault();
-                // get the mouse cursor position at startup:
-                pos3 = e.clientX;
-                pos4 = e.clientY;
-                document.onmouseup = closeDragElement;
-                // call a function whenever the cursor moves:
-                document.onmousemove = elementDrag;
-            }
-
-            function elementDrag(e) {
-                e = e || window.event;
-                e.preventDefault();
-                // calculate the new cursor position:
-                pos1 = pos3 - e.clientX;
-                pos2 = pos4 - e.clientY;
-                pos3 = e.clientX;
-                pos4 = e.clientY;
-                // set the element's new position:
-                elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
-                elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-            }
-
-            function closeDragElement() {
-                /* stop moving when mouse button is released:*/
-                document.onmouseup = null;
-                document.onmousemove = null;
-            }
         }
     </script>
 </body>
